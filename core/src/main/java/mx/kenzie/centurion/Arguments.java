@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class Arguments implements Iterable<Object> {
     public static final Argument<Boolean> BOOLEAN = new TypedArgument<>(Boolean.class) {
@@ -29,12 +30,16 @@ public class Arguments implements Iterable<Object> {
         public String parse(String input) {
             return input;
         }
-    };
 
+        @Override
+        public int weight() {
+            return 20;
+        }
+    };
 
     private final ArrayList<Object> values;
 
-    public Arguments(Object... values) {
+    Arguments(Object... values) {
         this.values = new ArrayList<>(List.of(values));
     }
 
@@ -48,6 +53,31 @@ public class Arguments implements Iterable<Object> {
     @Override
     public Iterator<Object> iterator() {
         return values.iterator();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Arguments arguments)) return false;
+        return Objects.equals(values, arguments.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
+    }
+
+    public int size() {
+        return values.size();
+    }
+
+    public boolean isEmpty() {
+        return values.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return "Arguments" + values;
     }
 
 }

@@ -12,12 +12,23 @@ public interface Argument<Type> extends ArgumentFace {
 
 }
 
-@interface ArgumentFace {
+interface ArgumentFace {
     String label();
 
-    boolean plural() default false;
+    default boolean plural() {
+        return false;
+    }
 
-    int weight() default 10;
+    default boolean optional() {
+        return false;
+    }
 
-    boolean literal() default false;
+    default int weight() {
+        return 10;
+    }
+
+    default boolean literal() {
+        return false;
+    }
+
 }

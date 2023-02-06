@@ -17,4 +17,9 @@ public record LiteralArgument(String label) implements Argument<Void> {
         return true;
     }
 
+    @Override
+    public int weight() {
+        return 5;
+    }
+
 }

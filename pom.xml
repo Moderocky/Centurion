@@ -10,6 +10,8 @@
     <packaging>pom</packaging>
     <name>Centurion</name>
     <description>A deployable command framework.</description>
+    <url>https://github.com/Moderocky/Centurion</url>
+
     <modules>
         <module>core</module>
         <module>minecraft</module>

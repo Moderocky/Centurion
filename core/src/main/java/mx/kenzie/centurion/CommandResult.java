@@ -2,6 +2,7 @@ package mx.kenzie.centurion;
 
 public enum CommandResult implements Result {
     PASSED(true),
+    NO_BEHAVIOUR(false),
     FAILED_UNKNOWN(false),
     FAILED_EXCEPTION(false);
     public final boolean successful;

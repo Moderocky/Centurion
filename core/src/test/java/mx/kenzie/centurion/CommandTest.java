@@ -6,15 +6,16 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static mx.kenzie.centurion.Arguments.INTEGER;
-import static mx.kenzie.centurion.Arguments.STRING_END;
+import static mx.kenzie.centurion.Arguments.*;
 
 public class CommandTest extends Command<TestSender> {
 
     @BeforeClass
-    public static void setup() {
-        assert new CommandTest().behaviour != null; // warm up
-        assert new CommandTest().execute(null, "") != null; // warm up
+    public static void setup() { // warm up
+        assert new CommandTest().behaviour != null;
+        assert new CommandTest().execute(null, "") != null;
+        assert new CommandTest().execute(new TestSender(), "general") != null;
+        assert !new CommandTest().execute(null, "test general").successful();
     }
 
     @Test
@@ -63,6 +64,24 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void optionalArgumentMet() {
+        final String input = "general kenobi";
+        final TestSender sender = new TestSender();
+        final Result result = this.execute(sender, input);
+        assert result.successful();
+        assert Objects.equals("kenobi", sender.output) : sender.output;
+    }
+
+    @Test
+    public void optionalArgumentNotMet() {
+        final String input = "general";
+        final TestSender sender = new TestSender();
+        final Result result = this.execute(sender, input);
+        assert result.successful();
+        assert Objects.equals(null, sender.output) : sender.output;
+    }
+
+    @Test
     public void inputArgument() {
         final String input = "test hello beans";
         final TestSender sender = new TestSender();
@@ -73,12 +92,17 @@ public class CommandTest extends Command<TestSender> {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello there, test hello <int>, test hello <string>, test hello <string...>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello there, test hello <int>, test general [string], test hello <string>, test hello <string...>]") : Arrays.toString(this.patterns());
     }
 
     @Override
     public Behaviour create() {
         return this.command("test")
+            .arg("general", OPTIONAL_STRING, (sender, arguments) -> {
+                assert !arguments.isEmpty();
+                sender.output = arguments.get(0);
+                return CommandResult.PASSED;
+            })
             .arg("hello", (sender, arguments) -> {
                 sender.output = "hello";
                 return CommandResult.PASSED;
@@ -88,7 +112,7 @@ public class CommandTest extends Command<TestSender> {
                 sender.output = "int " + arguments.get(0);
                 return CommandResult.PASSED;
             })
-            .arg("hello", STRING_END, (sender, arguments) -> {
+            .arg("hello", GREEDY_STRING, (sender, arguments) -> {
                 assert !arguments.isEmpty();
                 sender.output = arguments.get(0);
                 return CommandResult.PASSED;

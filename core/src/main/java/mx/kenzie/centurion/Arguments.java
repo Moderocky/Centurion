@@ -2,127 +2,48 @@ package mx.kenzie.centurion;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
 public class Arguments implements Iterable<Object> {
-    public static final Argument<Integer> INTEGER = new TypedArgument<>(Integer.class) {
-        private int lastHash, lastValue;
-
+    public static final Argument<Integer> INTEGER = new ArgInteger();
+    public static final Argument<Integer> OPTIONAL_INTEGER = new ArgInteger() {
         @Override
-        public String label() {
-            return "int";
-        }
-
-        @Override
-        public boolean matches(String input) {
-            this.lastHash = input.hashCode();
-            for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
-            try {
-                this.lastValue = Integer.parseInt(input);
-                return true;
-            } catch (Throwable ex) {
-                return false;
-            }
-        }
-
-        @Override
-        public Integer parse(String input) {
-            if (lastHash == input.hashCode()) return lastValue;
-            return Integer.parseInt(input.trim());
+        public boolean optional() {
+            return true;
         }
     };
-    public static final Argument<Long> LONG = new TypedArgument<>(Long.class) {
-        private int lastHash;
-        private long lastValue;
-
+    public static final Argument<Long> LONG = new ArgLong();
+    public static final Argument<Long> OPTIONAL_LONG = new ArgLong() {
         @Override
-        public boolean matches(String input) {
-            this.lastHash = input.hashCode();
-            for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
-            try {
-                this.lastValue = Long.parseLong(input);
-                return true;
-            } catch (Throwable ex) {
-                return false;
-            }
-        }
-
-        @Override
-        public Long parse(String input) {
-            if (lastHash == input.hashCode()) return lastValue;
-            return Long.parseLong(input.trim());
+        public boolean optional() {
+            return true;
         }
     };
-    public static final Argument<Double> DOUBLE = new TypedArgument<>(Double.class) {
-        private int lastHash;
-        private double lastValue;
-
+    public static final Argument<Double> DOUBLE = new ArgDouble();
+    public static final Argument<Double> OPTIONAL_DOUBLE = new ArgDouble() {
         @Override
-        public String label() {
-            return "number";
-        }
-
-        @Override
-        public boolean matches(String input) {
-            this.lastHash = input.hashCode();
-            if (input.endsWith("D") || input.endsWith("d")) input = input.substring(0, input.length() - 1);
-            try {
-                this.lastValue = Double.parseDouble(input);
-                return true;
-            } catch (Throwable ex) {
-                return false;
-            }
-        }
-
-        @Override
-        public Double parse(String input) {
-            if (lastHash == input.hashCode()) return lastValue;
-            if (input.endsWith("D") || input.endsWith("d"))
-                return Double.parseDouble(input.substring(0, input.length() - 1));
-            return Double.parseDouble(input.trim());
+        public boolean optional() {
+            return true;
         }
     };
-    public static final Argument<Boolean> BOOLEAN = new TypedArgument<>(Boolean.class) {
+    public static final Argument<Boolean> BOOLEAN = new ArgBoolean();
+    public static final Argument<Boolean> OPTIONAL_BOOLEAN = new ArgBoolean() {
         @Override
-        public boolean matches(String input) {
-            final String parsed = input.toLowerCase().trim();
-            return parsed.equals("true") || parsed.equals("false");
-        }
-
-        @Override
-        public Boolean parse(String input) {
-            return Boolean.parseBoolean(input.toLowerCase().trim());
+        public boolean optional() {
+            return true;
         }
     };
-    public static final Argument<String> STRING = new TypedArgument<>(String.class) {
+    public static final Argument<String> STRING = new ArgString();
+    public static final Argument<String> OPTIONAL_STRING = new ArgString() {
         @Override
-        public boolean matches(String input) {
-            return input.length() > 0;
-        }
-
-        @Override
-        public String parse(String input) {
-            return input;
-        }
-
-        @Override
-        public int weight() {
-            return 20;
+        public boolean optional() {
+            return true;
         }
     };
-    public static final Argument<String> STRING_END = new TypedArgument<>(String.class) {
-        @Override
-        public boolean matches(String input) {
-            return input.length() > 0;
-        }
-
-        @Override
-        public String parse(String input) {
-            return input;
-        }
+    public static final Argument<String> GREEDY_STRING = new ArgString() {
 
         @Override
         public int weight() {
@@ -133,12 +54,13 @@ public class Arguments implements Iterable<Object> {
         public boolean plural() {
             return true;
         }
+
     };
 
-    private final ArrayList<Object> values;
+    private final List<Object> values;
 
     Arguments(Object... values) {
-        this.values = new ArrayList<>(List.of(values));
+        this.values = Arrays.asList(values);
     }
 
     @SuppressWarnings("unchecked")
@@ -178,4 +100,145 @@ public class Arguments implements Iterable<Object> {
         return "Arguments" + values;
     }
 
+}
+
+abstract class HashedArg<Type> extends TypedArgument<Type> {
+    protected int lastHash;
+    protected Type lastValue;
+
+    public HashedArg(Class<Type> type) {
+        super(type);
+    }
+
+    @Override
+    public Type parse(String input) {
+        if (lastHash == input.hashCode()) return lastValue;
+        return this.parseNew(input);
+    }
+
+    public abstract Type parseNew(String input);
+
+}
+
+class ArgInteger extends HashedArg<Integer> {
+
+    public ArgInteger() {
+        super(Integer.class);
+    }
+
+    @Override
+    public String label() {
+        return "int";
+    }
+
+    @Override
+    public boolean matches(String input) {
+        this.lastHash = input.hashCode();
+        for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
+        try {
+            this.lastValue = Integer.parseInt(input);
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public Integer parseNew(String input) {
+        return Integer.parseInt(input.trim());
+    }
+}
+
+class ArgLong extends HashedArg<Long> {
+
+    public ArgLong() {
+        super(Long.class);
+    }
+
+    @Override
+    public boolean matches(String input) {
+        this.lastHash = input.hashCode();
+        for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
+        try {
+            this.lastValue = Long.parseLong(input);
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public Long parseNew(String input) {
+        return Long.parseLong(input.trim());
+    }
+}
+
+class ArgDouble extends HashedArg<Double> {
+
+    public ArgDouble() {
+        super(Double.class);
+    }
+
+    @Override
+    public String label() {
+        return "number";
+    }
+
+    @Override
+    public boolean matches(String input) {
+        this.lastHash = input.hashCode();
+        if (input.endsWith("D") || input.endsWith("d")) input = input.substring(0, input.length() - 1);
+        try {
+            this.lastValue = Double.parseDouble(input);
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public Double parseNew(String input) {
+        if (input.endsWith("D") || input.endsWith("d"))
+            return Double.parseDouble(input.substring(0, input.length() - 1));
+        return Double.parseDouble(input.trim());
+    }
+}
+
+class ArgString extends TypedArgument<String> {
+
+    public ArgString() {
+        super(String.class);
+    }
+
+    @Override
+    public boolean matches(String input) {
+        return input.length() > 0;
+    }
+
+    @Override
+    public String parse(String input) {
+        return input;
+    }
+
+    @Override
+    public int weight() {
+        return 20;
+    }
+}
+
+class ArgBoolean extends TypedArgument<Boolean> {
+    public ArgBoolean() {
+        super(Boolean.class);
+    }
+
+    @Override
+    public boolean matches(String input) {
+        final String parsed = input.toLowerCase().trim();
+        return parsed.equals("true") || parsed.equals("false");
+    }
+
+    @Override
+    public Boolean parse(String input) {
+        return input.trim().equalsIgnoreCase("true");
+    }
 }

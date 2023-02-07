@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -104,12 +105,15 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         if (args == null || args.length < 1) input = label;
         else input = label + " " + String.join(" ", args);
         final Result result = this.execute(sender, input);
+        if (result.error() != null) {
+            Bukkit.getLogger().log(Level.SEVERE, "Error in command: " + label + Arrays.toString(args));
+            result.error().printStackTrace();
+        }
         return result.successful();
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String... args) {
-
         return null;
     }
 

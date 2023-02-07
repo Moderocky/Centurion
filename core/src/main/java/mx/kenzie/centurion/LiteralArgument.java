@@ -22,4 +22,9 @@ public record LiteralArgument(String label) implements Argument<Void> {
         return 3;
     }
 
+    @Override
+    public String[] possibilities() {
+        return new String[]{label};
+    }
+
 }

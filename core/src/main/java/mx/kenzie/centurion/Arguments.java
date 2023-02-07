@@ -8,42 +8,49 @@ import java.util.List;
 import java.util.Objects;
 
 public class Arguments implements Iterable<Object> {
-    public static final Argument<Integer> INTEGER = new ArgInteger();
-    public static final Argument<Integer> OPTIONAL_INTEGER = new ArgInteger() {
+    public static final TypedArgument<Class> CLASS = new ArgClass();
+    public static final TypedArgument<Class> OPTIONAL_CLASS = new ArgClass() {
         @Override
         public boolean optional() {
             return true;
         }
     };
-    public static final Argument<Long> LONG = new ArgLong();
-    public static final Argument<Long> OPTIONAL_LONG = new ArgLong() {
+    public static final TypedArgument<Integer> INTEGER = new ArgInteger();
+    public static final TypedArgument<Integer> OPTIONAL_INTEGER = new ArgInteger() {
         @Override
         public boolean optional() {
             return true;
         }
     };
-    public static final Argument<Double> DOUBLE = new ArgDouble();
-    public static final Argument<Double> OPTIONAL_DOUBLE = new ArgDouble() {
+    public static final TypedArgument<Long> LONG = new ArgLong();
+    public static final TypedArgument<Long> OPTIONAL_LONG = new ArgLong() {
         @Override
         public boolean optional() {
             return true;
         }
     };
-    public static final Argument<Boolean> BOOLEAN = new ArgBoolean();
-    public static final Argument<Boolean> OPTIONAL_BOOLEAN = new ArgBoolean() {
+    public static final TypedArgument<Double> DOUBLE = new ArgDouble();
+    public static final TypedArgument<Double> OPTIONAL_DOUBLE = new ArgDouble() {
         @Override
         public boolean optional() {
             return true;
         }
     };
-    public static final Argument<String> STRING = new ArgString();
-    public static final Argument<String> OPTIONAL_STRING = new ArgString() {
+    public static final TypedArgument<Boolean> BOOLEAN = new ArgBoolean();
+    public static final TypedArgument<Boolean> OPTIONAL_BOOLEAN = new ArgBoolean() {
         @Override
         public boolean optional() {
             return true;
         }
     };
-    public static final Argument<String> GREEDY_STRING = new ArgString() {
+    public static final TypedArgument<String> STRING = new ArgString();
+    public static final TypedArgument<String> OPTIONAL_STRING = new ArgString() {
+        @Override
+        public boolean optional() {
+            return true;
+        }
+    };
+    public static final TypedArgument<String> GREEDY_STRING = new ArgString() {
 
         @Override
         public int weight() {
@@ -67,6 +74,31 @@ public class Arguments implements Iterable<Object> {
     public <Type> Type get(int index) {
         if (index >= values.size()) return null;
         return (Type) values.get(index);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <Type> Type get(Class<Type> type) {
+        for (Object value : values) {
+            if (type.isInstance(value)) return (Type) value;
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <Type> Type get(Class<Type> type, int index) {
+        for (Object value : values) {
+            if (!type.isInstance(value)) continue;
+            if (index-- < 1) return (Type) value;
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <Type> Type get(TypedArgument<Type> type) {
+        for (Object value : values) {
+            if (type.type.isInstance(value)) return (Type) value;
+        }
+        return null;
     }
 
     @NotNull
@@ -241,4 +273,38 @@ class ArgBoolean extends TypedArgument<Boolean> {
     public Boolean parse(String input) {
         return input.trim().equalsIgnoreCase("true");
     }
+
+    @Override
+    public String[] possibilities() {
+        return new String[]{"true", "false"};
+    }
+
+}
+
+class ArgClass extends HashedArg<Class> {
+    public ArgClass() {
+        super(Class.class);
+    }
+
+    @Override
+    public boolean matches(String input) {
+        final String parsed = input.toLowerCase().trim();
+        return parsed.equals("true") || parsed.equals("false");
+    }
+
+    @Override
+    public Class<?> parseNew(String input) {
+        this.lastHash = input.hashCode();
+        try {
+            return lastValue = Class.forName(input.trim());
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public String[] possibilities() {
+        return new String[]{"true", "false"};
+    }
+
 }

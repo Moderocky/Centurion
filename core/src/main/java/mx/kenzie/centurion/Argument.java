@@ -31,4 +31,8 @@ interface ArgumentFace {
         return false;
     }
 
+    default String[] possibilities() {
+        return new String[0];
+    }
+
 }

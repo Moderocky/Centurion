@@ -30,7 +30,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         this.description = description;
         this.usage = '/' + behaviour.label;
         this.permission = null;
-        this.permissionMessage = null;
+        this.permissionMessage = this.getPermissionMessage();
     }
 
     protected MinecraftCommand(String description, String usage, String permission, Component permissionMessage) {
@@ -39,6 +39,14 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         this.usage = usage;
         this.permission = permission;
         this.permissionMessage = permissionMessage;
+    }
+
+    protected Component getPermissionMessage() {
+        final ColorProfile profile = this.getProfile();
+        return Component.textOfChildren(
+            Component.text("!! ", profile.pop()),
+            Component.translatable("commands.help.failed", profile.highlight())
+        );
     }
 
     protected CommandResult printUsage(CommandSender sender, Arguments arguments) {

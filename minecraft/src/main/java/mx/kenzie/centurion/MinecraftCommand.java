@@ -18,8 +18,8 @@ import java.util.logging.Level;
 
 public abstract class MinecraftCommand extends Command<CommandSender> implements TabCompleter, CommandExecutor {
     protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
-    protected final String description, usage, permission;
-    protected final Component permissionMessage;
+    protected String description, usage, permission;
+    protected Component permissionMessage;
 
     {
         this.behaviour.lapse = this::printUsage;

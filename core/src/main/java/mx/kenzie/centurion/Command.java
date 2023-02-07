@@ -55,6 +55,82 @@ public abstract class Command<Sender> {
 
     }
 
+    protected record ArgumentContainer(Argument<?>... arguments) {
+
+        public int weight() {
+            int weight = 0;
+            for (Argument<?> argument : arguments) weight += argument.weight();
+            return weight;
+        }
+
+        public int size() {
+            return arguments.length;
+        }
+
+        public boolean hasInput() {
+            for (Argument<?> argument : arguments) if (!argument.literal()) return false;
+            return true;
+        }
+
+        public boolean hasOptional() {
+            for (Argument<?> argument : arguments) if (argument.optional()) return true;
+            return false;
+        }
+
+        public Object[] check(String input) {
+            final List<Object> inputs = new ArrayList<>(8);
+            for (Argument<?> argument : arguments) {
+                final String part;
+                final int space = input.indexOf(' ');
+                if (argument.plural() || space < 0) {
+                    part = input.trim();
+                    input = "";
+                } else {
+                    part = input.substring(0, space).trim();
+                    input = input.substring(space + 1).stripLeading();
+                }
+                if (part.isEmpty() && argument.optional()) {
+                    inputs.add(null);
+                    continue;
+                }
+                if (!argument.matches(part)) return null;
+                if (argument.literal()) continue;
+                inputs.add(argument.parse(part));
+            }
+            if (!input.isBlank()) return null;
+            return inputs.toArray(new Object[0]);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder();
+            for (Argument<?> argument : arguments) {
+                builder.append(' ');
+                final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
+                if (optional) builder.append('[');
+                else if (!literal) builder.append('<');
+                builder.append(argument.label());
+                if (plural) builder.append("...");
+                if (optional) builder.append(']');
+                else if (!literal) builder.append('>');
+            }
+            return builder.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ArgumentContainer that)) return false;
+            return Arrays.equals(arguments, that.arguments);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(arguments);
+        }
+
+    }
+
     protected class Execution {
         protected final Input<Sender> function;
         protected final Arguments arguments;
@@ -67,7 +143,7 @@ public abstract class Command<Sender> {
 
     @SuppressWarnings("unchecked")
     public class Behaviour {
-        private static final Input<?> DEFAULT_LAPSE = (sender, arguments) -> CommandResult.NO_BEHAVIOUR;
+        public static final Input<?> DEFAULT_LAPSE = (sender, arguments) -> CommandResult.NO_BEHAVIOUR;
 
         protected final String label;
         protected final Set<String> aliases;
@@ -167,80 +243,24 @@ public abstract class Command<Sender> {
             return patterns;
         }
 
-    }
-
-    protected record ArgumentContainer(Argument<?>... arguments) {
-
-        public int weight() {
-            int weight = 0;
-            for (Argument<?> argument : arguments) weight += argument.weight();
-            return weight;
-        }
-
-        public int size() {
-            return arguments.length;
-        }
-
-        public boolean hasInput() {
-            for (Argument<?> argument : arguments) if (!argument.literal()) return false;
-            return true;
-        }
-
-        public boolean hasOptional() {
-            for (Argument<?> argument : arguments) if (argument.optional()) return true;
-            return false;
-        }
-
-        public Object[] check(String input) {
-            final List<Object> inputs = new ArrayList<>(8);
-            for (Argument<?> argument : arguments) {
-                final String part;
-                final int space = input.indexOf(' ');
-                if (argument.plural() || space < 0) {
-                    part = input.trim();
-                    input = "";
-                } else {
-                    part = input.substring(0, space).trim();
-                    input = input.substring(space + 1).stripLeading();
-                }
-                if (part.isEmpty() && argument.optional()) {
-                    inputs.add(null);
-                    continue;
-                }
-                if (!argument.matches(part)) return null;
-                if (argument.literal()) continue;
-                inputs.add(argument.parse(part));
-            }
-            if (!input.isBlank()) return null;
-            return inputs.toArray(new Object[0]);
-        }
-
         @Override
         public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            for (Argument<?> argument : arguments) {
-                builder.append(' ');
-                final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
-                if (optional) builder.append('[');
-                else if (!literal) builder.append('<');
-                builder.append(argument.label());
-                if (plural) builder.append("...");
-                if (optional) builder.append(']');
-                else if (!literal) builder.append('>');
-            }
-            return builder.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ArgumentContainer that)) return false;
-            return Arrays.equals(arguments, that.arguments);
+            return "Behaviour{" +
+                "label='" + label + '\'' +
+                ", aliases=" + aliases +
+                ", functions=" + functions +
+                ", arguments=" + arguments +
+                ", lapse=" + lapse +
+                ", sorted=" + sorted +
+                ", patterns=" + Arrays.toString(patterns) +
+                '}';
         }
 
         @Override
         public int hashCode() {
-            return Arrays.hashCode(arguments);
+            int result = Objects.hash(label, aliases, functions, arguments, lapse, sorted);
+            result = 31 * result + Arrays.hashCode(patterns);
+            return result;
         }
 
     }

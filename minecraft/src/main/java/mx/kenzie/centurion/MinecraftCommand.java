@@ -22,7 +22,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     protected Component permissionMessage;
 
     {
-        this.behaviour.lapse = this::printUsage;
+        if (behaviour.lapse == Behaviour.DEFAULT_LAPSE) behaviour.lapse = this::printUsage;
     }
 
     protected MinecraftCommand(String description) {
@@ -78,6 +78,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             builder.append(Component.newline()).append(Component.text("  "));
             builder.append(line);
         }
+        sender.sendMessage(builder.build());
         return CommandResult.PASSED;
     }
 

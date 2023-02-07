@@ -8,6 +8,83 @@ import java.util.List;
 import java.util.Objects;
 
 public class Arguments implements Iterable<Object> {
+    public static final Argument<Integer> INTEGER = new TypedArgument<>(Integer.class) {
+        private int lastHash, lastValue;
+
+        @Override
+        public String label() {
+            return "int";
+        }
+
+        @Override
+        public boolean matches(String input) {
+            this.lastHash = input.hashCode();
+            for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
+            try {
+                this.lastValue = Integer.parseInt(input);
+                return true;
+            } catch (Throwable ex) {
+                return false;
+            }
+        }
+
+        @Override
+        public Integer parse(String input) {
+            if (lastHash == input.hashCode()) return lastValue;
+            return Integer.parseInt(input.trim());
+        }
+    };
+    public static final Argument<Long> LONG = new TypedArgument<>(Long.class) {
+        private int lastHash;
+        private long lastValue;
+
+        @Override
+        public boolean matches(String input) {
+            this.lastHash = input.hashCode();
+            for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
+            try {
+                this.lastValue = Long.parseLong(input);
+                return true;
+            } catch (Throwable ex) {
+                return false;
+            }
+        }
+
+        @Override
+        public Long parse(String input) {
+            if (lastHash == input.hashCode()) return lastValue;
+            return Long.parseLong(input.trim());
+        }
+    };
+    public static final Argument<Double> DOUBLE = new TypedArgument<>(Double.class) {
+        private int lastHash;
+        private double lastValue;
+
+        @Override
+        public String label() {
+            return "number";
+        }
+
+        @Override
+        public boolean matches(String input) {
+            this.lastHash = input.hashCode();
+            if (input.endsWith("D") || input.endsWith("d")) input = input.substring(0, input.length() - 1);
+            try {
+                this.lastValue = Double.parseDouble(input);
+                return true;
+            } catch (Throwable ex) {
+                return false;
+            }
+        }
+
+        @Override
+        public Double parse(String input) {
+            if (lastHash == input.hashCode()) return lastValue;
+            if (input.endsWith("D") || input.endsWith("d"))
+                return Double.parseDouble(input.substring(0, input.length() - 1));
+            return Double.parseDouble(input.trim());
+        }
+    };
     public static final Argument<Boolean> BOOLEAN = new TypedArgument<>(Boolean.class) {
         @Override
         public boolean matches(String input) {
@@ -23,7 +100,7 @@ public class Arguments implements Iterable<Object> {
     public static final Argument<String> STRING = new TypedArgument<>(String.class) {
         @Override
         public boolean matches(String input) {
-            return true;
+            return input.length() > 0;
         }
 
         @Override
@@ -34,6 +111,27 @@ public class Arguments implements Iterable<Object> {
         @Override
         public int weight() {
             return 20;
+        }
+    };
+    public static final Argument<String> STRING_END = new TypedArgument<>(String.class) {
+        @Override
+        public boolean matches(String input) {
+            return input.length() > 0;
+        }
+
+        @Override
+        public String parse(String input) {
+            return input;
+        }
+
+        @Override
+        public int weight() {
+            return super.weight() + 20;
+        }
+
+        @Override
+        public boolean plural() {
+            return true;
         }
     };
 

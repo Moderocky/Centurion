@@ -7,7 +7,7 @@ public interface Argument<Type> extends ArgumentFace {
     Type parse(String input);
 
     default int weight() {
-        return this.plural() ? 100 : 10;
+        return this.plural() ? 100 : this.literal() ? 3 : 10;
     }
 
     default Type lapse() {

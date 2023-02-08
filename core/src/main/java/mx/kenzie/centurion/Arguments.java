@@ -6,50 +6,21 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class Arguments implements Iterable<Object> {
     public static final TypedArgument<Class> CLASS = new ArgClass();
-    public static final TypedArgument<Class> OPTIONAL_CLASS = new ArgClass() {
-        @Override
-        public boolean optional() {
-            return true;
-        }
-    };
+    public static final TypedArgument<Class> OPTIONAL_CLASS = CLASS.asOptional();
     public static final TypedArgument<Integer> INTEGER = new ArgInteger();
-    public static final TypedArgument<Integer> OPTIONAL_INTEGER = new ArgInteger() {
-        @Override
-        public boolean optional() {
-            return true;
-        }
-    };
+    public static final TypedArgument<Integer> OPTIONAL_INTEGER = INTEGER.asOptional();
     public static final TypedArgument<Long> LONG = new ArgLong();
-    public static final TypedArgument<Long> OPTIONAL_LONG = new ArgLong() {
-        @Override
-        public boolean optional() {
-            return true;
-        }
-    };
+    public static final TypedArgument<Long> OPTIONAL_LONG = LONG.asOptional();
     public static final TypedArgument<Double> DOUBLE = new ArgDouble();
-    public static final TypedArgument<Double> OPTIONAL_DOUBLE = new ArgDouble() {
-        @Override
-        public boolean optional() {
-            return true;
-        }
-    };
+    public static final TypedArgument<Double> OPTIONAL_DOUBLE = DOUBLE.asOptional();
     public static final TypedArgument<Boolean> BOOLEAN = new ArgBoolean();
-    public static final TypedArgument<Boolean> OPTIONAL_BOOLEAN = new ArgBoolean() {
-        @Override
-        public boolean optional() {
-            return true;
-        }
-    };
+    public static final TypedArgument<Boolean> OPTIONAL_BOOLEAN = BOOLEAN.asOptional();
     public static final TypedArgument<String> STRING = new ArgString();
-    public static final TypedArgument<String> OPTIONAL_STRING = new ArgString() {
-        @Override
-        public boolean optional() {
-            return true;
-        }
-    };
+    public static final TypedArgument<String> OPTIONAL_STRING = STRING.asOptional();
     public static final TypedArgument<String> GREEDY_STRING = new ArgString() {
 
         @Override
@@ -254,8 +225,9 @@ class ArgString extends TypedArgument<String> {
 
     @Override
     public int weight() {
-        return 20;
+        return super.weight() + 10;
     }
+
 }
 
 class ArgBoolean extends TypedArgument<Boolean> {
@@ -283,32 +255,32 @@ class ArgBoolean extends TypedArgument<Boolean> {
     public Boolean lapse() {
         return false;
     }
+
 }
 
 class ArgClass extends HashedArg<Class> {
+    private static final Pattern PART = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
+    private static final Pattern CLASS = Pattern.compile(PART + "(\\." + PART + ")*");
+
     public ArgClass() {
         super(Class.class);
     }
 
     @Override
     public boolean matches(String input) {
-        final String parsed = input.toLowerCase().trim();
-        return parsed.equals("true") || parsed.equals("false");
+        this.lastHash = input.hashCode();
+        if (!CLASS.matcher(input).matches()) return false;
+        return (lastValue = this.parseNew(input)) != null;
     }
 
     @Override
     public Class<?> parseNew(String input) {
-        this.lastHash = input.hashCode();
         try {
-            return lastValue = Class.forName(input.trim());
+            return Class.forName(input.trim());
         } catch (ClassNotFoundException ex) {
             return null;
         }
     }
 
-    @Override
-    public String[] possibilities() {
-        return new String[]{"true", "false"};
-    }
 
 }

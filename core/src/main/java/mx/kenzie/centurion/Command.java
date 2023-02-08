@@ -18,8 +18,7 @@ public abstract class Command<Sender> {
     }
 
     public Result execute(Sender sender, String input) {
-        final Execution execution = behaviour.match(input);
-        return execution.function.apply(sender, execution.arguments);
+        return behaviour.execute(sender, input);
     }
 
     public String[] patterns() {
@@ -263,5 +262,33 @@ public abstract class Command<Sender> {
             return result;
         }
 
+        public Result execute(Sender sender, String input) {
+            final Execution execution = behaviour.match(input);
+            this.sort();
+            remove_name:
+            {
+                if (input.startsWith(label)) {
+                    input = input.substring(label.length());
+                    break remove_name;
+                }
+                for (String alias : aliases)
+                    if (input.startsWith(alias)) {
+                        input = input.substring(alias.length());
+                        break remove_name;
+                    }
+            }
+            input = input.stripLeading();
+            if (input.isEmpty()) return lapse.apply(sender, new Arguments());
+            for (ArgumentContainer argument : arguments) {
+                final Object[] inputs = argument.check(input);
+                if (inputs == null) continue;
+                final Input<Sender> function = functions.get(argument);
+                assert function != null;
+                final Result result = function.apply(sender, new Arguments(inputs));
+                if (result.successful()) return result;
+                if (result != CommandResult.WRONG_INPUT) return result;
+            }
+            return lapse.apply(sender, new Arguments());
+        }
     }
 }

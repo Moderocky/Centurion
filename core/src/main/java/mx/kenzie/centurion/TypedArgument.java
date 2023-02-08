@@ -5,14 +5,16 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
     public final Class<Type> type;
     protected boolean optional, greedy;
     protected Type lapse = null;
+    protected String label;
 
     public TypedArgument(Class<Type> type) {
         this.type = type;
+        this.label = type.getSimpleName().toLowerCase();
     }
 
     @Override
     public String label() {
-        return type.getSimpleName().toLowerCase();
+        return label;
     }
 
     @Override
@@ -56,6 +58,13 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
         final TypedArgument<Type> argument = this.clone();
         argument.lapse = lapse;
         return argument;
+    }
+
+    public TypedArgument<Type> labelled(String label) {
+        final TypedArgument<Type> argument = this.clone();
+        argument.label = label;
+        return argument;
+
     }
 
 }

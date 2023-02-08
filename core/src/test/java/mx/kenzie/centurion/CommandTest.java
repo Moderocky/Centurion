@@ -83,6 +83,16 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void wrongInputFallThrough() {
+        final String input = "test hello 12";
+        final TestSender sender = new TestSender();
+        final Result result = this.execute(sender, input);
+        assert result.successful();
+        assert !Objects.equals("bad", sender.output) : sender.output;
+        assert Objects.equals("int 12", sender.output) : sender.output;
+    }
+
+    @Test
     public void inputArgument() {
         final String input = "test hello beans";
         final TestSender sender = new TestSender();
@@ -111,7 +121,7 @@ public class CommandTest extends Command<TestSender> {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello there, test hello <int>, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello 12, test hello there, test hello <int>, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -125,6 +135,10 @@ public class CommandTest extends Command<TestSender> {
             .arg("hello", (sender, arguments) -> {
                 sender.output = "hello";
                 return CommandResult.PASSED;
+            })
+            .arg("hello", "12", (sender, arguments) -> {
+                sender.output = "bad";
+                return CommandResult.WRONG_INPUT;
             })
             .arg("hello", INTEGER, (sender, arguments) -> {
                 assert !arguments.isEmpty();

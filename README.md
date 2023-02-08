@@ -341,6 +341,45 @@ Commands return a result with some information about its execution.
 These have a boolean `successful()` value and a `CommandResult` enum `type()` for switching. \
 They may also provide a `Throwable` error that occurred when trying to dispatch, parse or run the command function.
 
+#### Failures
+
+A failure result will be marked `successful() == false`. This means that the command failed in its regular execution in
+one of several ways.
+
+Example failure standards:
+
+1. No lapse behaviour was defined for the command and the input matched no argument.
+2. An uncaught error was thrown during either parsing or execution. This error is provided in the result.
+    - N.B. this may have halted a command *part way through* execution - safety checks are advised.
+3. A command function returned a failure result.
+
+#### Input Validation
+
+Functions may apply additional validation to inputs through the use of the `WRONG_INPUT` or `LAPSE` failure results.
+These results are a __special case__; they are _not_ a failure condition for the command execution.
+
+If the `WRONG_INPUT` result is returned, the line of argument parsing will be abandoned and the iteration will move on.
+If no subsequent argument patterns match the input this will fall to the lapse case.
+
+Please note that this sort of fall-through can be dangerous and may lead to unexpected conditions being met.\
+Exempli gratia:
+
+```
+input    test hello there
+case #1  test hello <string>  -> WRONG_INPUT // continues
+case #1  test <string...>     -> PASSED      // accepted here
+lapse                                        // never reaches lapse
+```
+
+Alternatively, the `LAPSE` result will break parsing and go straight to the `lapse` function.
+
+```
+input    test hello there
+case #1  test hello <string>  -> LAPSE       // jumps
+case #1  test <string...>     ->             // skipped
+lapse                         -> PASSED      // accepted here
+```
+
 ## Motivations
 
 Centurion is the follow-on from [Commander](https://github.com/Moderocky/Commander), my previous command framework.
@@ -358,7 +397,7 @@ Centurion also supports automatic typing when retrieving an argument.
 
 ### Commander
 
-```java 
+```jshelllanguage 
 command("test")
     .arg("hello",
         arg("there", sender -> {
@@ -374,7 +413,7 @@ command("test")
 
 ### Centurion
 
-```java 
+```jshelllanguage 
 command("test")
     .arg("hello", "there", (sender, arguments) -> {
         System.out.println("General Kenobi!");

@@ -263,7 +263,6 @@ public abstract class Command<Sender> {
         }
 
         public Result execute(Sender sender, String input) {
-            final Execution execution = behaviour.match(input);
             this.sort();
             remove_name:
             {
@@ -285,8 +284,8 @@ public abstract class Command<Sender> {
                 final Input<Sender> function = functions.get(argument);
                 assert function != null;
                 final Result result = function.apply(sender, new Arguments(inputs));
-                if (result.successful()) return result;
-                if (result != CommandResult.WRONG_INPUT) return result;
+                if (result.type().endParsing) return result;
+                if (result == CommandResult.LAPSE) break;
             }
             return lapse.apply(sender, new Arguments());
         }

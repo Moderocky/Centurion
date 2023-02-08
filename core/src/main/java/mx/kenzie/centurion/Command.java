@@ -68,8 +68,8 @@ public abstract class Command<Sender> {
         }
 
         public boolean hasInput() {
-            for (Argument<?> argument : arguments) if (!argument.literal()) return false;
-            return true;
+            for (Argument<?> argument : arguments) if (!argument.literal()) return true;
+            return false;
         }
 
         public boolean hasOptional() {

@@ -90,7 +90,7 @@ public abstract class Command<Sender> {
                     input = input.substring(space + 1).stripLeading();
                 }
                 if (part.isEmpty() && argument.optional()) {
-                    inputs.add(null);
+                    inputs.add(argument.lapse());
                     continue;
                 }
                 if (!argument.matches(part)) return null;

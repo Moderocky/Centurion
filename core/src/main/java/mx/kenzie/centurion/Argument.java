@@ -10,6 +10,10 @@ public interface Argument<Type> extends ArgumentFace {
         return this.plural() ? 100 : 10;
     }
 
+    default Type lapse() {
+        return null;
+    }
+
 }
 
 interface ArgumentFace {

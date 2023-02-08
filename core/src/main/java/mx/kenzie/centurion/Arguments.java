@@ -279,6 +279,10 @@ class ArgBoolean extends TypedArgument<Boolean> {
         return new String[]{"true", "false"};
     }
 
+    @Override
+    public Boolean lapse() {
+        return false;
+    }
 }
 
 class ArgClass extends HashedArg<Class> {

@@ -16,6 +16,7 @@ public class CommandTest extends Command<TestSender> {
         assert new CommandTest().execute(null, "") != null;
         assert new CommandTest().execute(new TestSender(), "general") != null;
         assert !new CommandTest().execute(null, "test general").successful();
+        assert !new CommandTest().execute(null, "test blob").successful();
     }
 
     @Test
@@ -100,8 +101,17 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void optionalLapseArgument() {
+        final String input = "test blob";
+        final TestSender sender = new TestSender();
+        final Result result = this.execute(sender, input);
+        assert result.successful();
+        assert Objects.equals("lot null false", sender.output) : sender.output;
+    }
+
+    @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello there, test hello <int>, test general [string], test hello <string>, test hello <string...>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello there, test hello <int>, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -119,6 +129,15 @@ public class CommandTest extends Command<TestSender> {
             .arg("hello", INTEGER, (sender, arguments) -> {
                 assert !arguments.isEmpty();
                 sender.output = "int " + arguments.get(0);
+                return CommandResult.PASSED;
+            })
+            .arg("blob", OPTIONAL_INTEGER, OPTIONAL_BOOLEAN, (sender, arguments) -> {
+                assert !arguments.isEmpty();
+                assert arguments.get(0) == null;
+                assert arguments.get(INTEGER) == null;
+                assert arguments.get(1) instanceof Boolean;
+                assert !arguments.get(BOOLEAN);
+                sender.output = "lot " + arguments.get(0) + " " + arguments.get(1);
                 return CommandResult.PASSED;
             })
             .arg("blob", INTEGER, BOOLEAN, DOUBLE, (sender, arguments) -> {

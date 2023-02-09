@@ -5,7 +5,14 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +23,13 @@ import java.util.*;
 import java.util.logging.Level;
 
 public abstract class MinecraftCommand extends Command<CommandSender> implements TabCompleter, CommandExecutor {
+    public static final EnumArgument<BlockFace> BLOCK_FACE = new EnumArgument<>(BlockFace.class);
+    public static final EnumArgument<Material> MATERIAL = new EnumArgument<>(Material.class);
+    public static final EnumArgument<EntityType> ENTITY_TYPE = new EnumArgument<>(EntityType.class);
+    public static final TypedArgument<BlockData> BLOCK_DATA = new BlockDataArgument();
+    public static final TypedArgument<Player> PLAYER = new PlayerArgument();
+    public static final TypedArgument<World> WORLD = new WorldArgument();
+    public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
     protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
     protected String description, usage, permission;
     protected Component permissionMessage;

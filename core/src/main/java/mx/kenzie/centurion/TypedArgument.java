@@ -6,6 +6,7 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
     protected boolean optional, greedy;
     protected Type lapse = null;
     protected String label;
+    protected String[] possibilities = new String[0];
 
     public TypedArgument(Class<Type> type) {
         this.type = type;
@@ -30,6 +31,11 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
     @Override
     public Type lapse() {
         return lapse;
+    }
+
+    @Override
+    public String[] possibilities() {
+        return possibilities;
     }
 
     @Override
@@ -64,7 +70,12 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
         final TypedArgument<Type> argument = this.clone();
         argument.label = label;
         return argument;
+    }
 
+    public TypedArgument<Type> possible(String... options) {
+        final TypedArgument<Type> argument = this.clone();
+        argument.possibilities = options;
+        return argument;
     }
 
 }

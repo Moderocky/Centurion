@@ -1,6 +1,6 @@
 package mx.kenzie.centurion;
 
-public record LiteralArgument(String label) implements Argument<Void> {
+public record LiteralArgument(String label) implements Argument<String> {
 
     @Override
     public boolean matches(String input) {
@@ -8,8 +8,8 @@ public record LiteralArgument(String label) implements Argument<Void> {
     }
 
     @Override
-    public Void parse(String input) {
-        return null;
+    public String parse(String input) {
+        return label;
     }
 
     @Override

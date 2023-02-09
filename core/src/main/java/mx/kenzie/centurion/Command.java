@@ -76,7 +76,7 @@ public abstract class Command<Sender> {
             return false;
         }
 
-        public Object[] check(String input) {
+        public Object[] check(String input, boolean passAllArguments) {
             final List<Object> inputs = new ArrayList<>(8);
             for (Argument<?> argument : arguments) {
                 final String part;
@@ -93,7 +93,7 @@ public abstract class Command<Sender> {
                     continue;
                 }
                 if (!argument.matches(part)) return null;
-                if (argument.literal()) continue;
+                if (!passAllArguments && argument.literal()) continue;
                 inputs.add(argument.parse(part));
             }
             if (!input.isBlank()) return null;
@@ -151,6 +151,7 @@ public abstract class Command<Sender> {
         protected Input<Sender> lapse = (Input<Sender>) DEFAULT_LAPSE;
         protected boolean sorted;
         protected String[] patterns;
+        protected boolean passAllArguments;
 
         protected Behaviour(String label, String... aliases) {
             this.label = label.toLowerCase();
@@ -176,13 +177,18 @@ public abstract class Command<Sender> {
             input = input.stripLeading();
             if (input.isEmpty()) return new Execution(lapse, new Arguments());
             for (ArgumentContainer argument : arguments) {
-                final Object[] inputs = argument.check(input);
+                final Object[] inputs = argument.check(input, passAllArguments);
                 if (inputs == null) continue;
                 final Input<Sender> function = functions.get(argument);
                 assert function != null;
                 return new Execution(function, new Arguments(inputs));
             }
             return new Execution(lapse, new Arguments());
+        }
+
+        public Behaviour passAllArguments() {
+            this.passAllArguments = true;
+            return this;
         }
 
         public Behaviour lapse(EmptyInput<Sender> function) {
@@ -279,7 +285,7 @@ public abstract class Command<Sender> {
             input = input.stripLeading();
             if (input.isEmpty()) return lapse.apply(sender, new Arguments());
             for (ArgumentContainer argument : arguments) {
-                final Object[] inputs = argument.check(input);
+                final Object[] inputs = argument.check(input, passAllArguments);
                 if (inputs == null) continue;
                 final Input<Sender> function = functions.get(argument);
                 assert function != null;

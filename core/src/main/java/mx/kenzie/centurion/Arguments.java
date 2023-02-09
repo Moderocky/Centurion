@@ -127,11 +127,7 @@ class ArgInteger extends HashedArg<Integer> {
 
     public ArgInteger() {
         super(Integer.class);
-    }
-
-    @Override
-    public String label() {
-        return "int";
+        this.label = "int";
     }
 
     @Override
@@ -180,11 +176,7 @@ class ArgDouble extends HashedArg<Double> {
 
     public ArgDouble() {
         super(Double.class);
-    }
-
-    @Override
-    public String label() {
-        return "number";
+        this.label = "number";
     }
 
     @Override

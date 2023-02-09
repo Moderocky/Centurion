@@ -12,9 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 public abstract class MinecraftCommand extends Command<CommandSender> implements TabCompleter, CommandExecutor {
@@ -114,7 +112,36 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String... args) {
-        return null;
+        final List<String> options = new ArrayList<>();
+        if (args.length < 1) for (ArgumentContainer argument : this.behaviour.arguments) {
+            options.addAll(List.of(argument.arguments()[0].possibilities()));
+        }
+        else {
+            final List<ArgumentContainer> containers = new LinkedList<>(this.behaviour.arguments);
+            final String[] complete = new String[args.length - 1];
+            final String current = args[args.length - 1].toLowerCase();
+            System.arraycopy(args, 0, complete, 0, complete.length);
+            final Iterator<ArgumentContainer> each = containers.iterator();
+            arguments:
+            while (each.hasNext()) {
+                final ArgumentContainer next = each.next();
+                final Argument<?>[] arguments = next.arguments();
+                if (arguments.length <= complete.length) continue;
+                int i = 0;
+                for (; i < complete.length; i++) {
+                    final String test = complete[i];
+                    if (!arguments[i].matches(test)) continue arguments;
+                }
+                options.addAll(List.of(arguments[i].possibilities()));
+            }
+            final Iterator<String> iterator = options.iterator();
+            while (iterator.hasNext()) {
+                final String next = iterator.next();
+                if (next.toLowerCase().startsWith(current)) continue;
+                iterator.remove();
+            }
+        }
+        return options;
     }
 
     @SuppressWarnings("deprecation")

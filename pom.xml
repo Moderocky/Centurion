@@ -15,6 +15,7 @@
     <modules>
         <module>core</module>
         <module>minecraft</module>
+        <module>discord</module>
     </modules>
 
     <properties>

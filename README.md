@@ -423,6 +423,26 @@ command("test")
     })
 ```
 
+## Provided Domain Support
+
+Centurion provides support for some domains out-of-the-box. This is not built in to the core library, but comes as
+separate modules that include the core.
+These modules can be used as dependencies in place of the core library.
+
+### Minecraft
+
+Commands for Minecraft's Bukkit server are available.
+These are registered in the `minecraft` module and available through `MinecraftCommand`.
+Some basic argument types for the domain are available, along with placeholder formatting support and interaction
+utilities.
+
+This support was built for a recent version of the game -- it will not support older versions, it may not support future
+versions without modification.
+
+### Discord
+
+TBD.
+
 ## Licensing
 
 The core of Centurion is available under MIT as seen in the repository.

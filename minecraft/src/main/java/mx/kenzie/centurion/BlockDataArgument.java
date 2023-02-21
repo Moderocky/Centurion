@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class BlockDataArgument extends HashedArg<BlockData> {
+
     public BlockDataArgument() {
         super(BlockData.class);
     }
@@ -38,4 +39,5 @@ class BlockDataArgument extends HashedArg<BlockData> {
         }
         return possibilities = list.toArray(new String[0]);
     }
+
 }

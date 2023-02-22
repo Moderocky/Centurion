@@ -397,7 +397,7 @@ Centurion also supports automatic typing when retrieving an argument.
 
 ### Commander
 
-```jshelllanguage 
+```java
 command("test")
     .arg("hello",
         arg("there", sender -> {
@@ -413,7 +413,7 @@ command("test")
 
 ### Centurion
 
-```jshelllanguage 
+```java
 command("test")
     .arg("hello", "there", (sender, arguments) -> {
         System.out.println("General Kenobi!");

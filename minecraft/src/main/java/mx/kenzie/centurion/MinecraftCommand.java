@@ -14,6 +14,7 @@ import org.bukkit.command.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +31,9 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
+    public static final Argument<org.bukkit.util.Vector> VECTOR = new CompoundArgument<Vector>("vector")
+        .arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
+        .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
     protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
     protected String description, usage, permission;
     protected Component permissionMessage;

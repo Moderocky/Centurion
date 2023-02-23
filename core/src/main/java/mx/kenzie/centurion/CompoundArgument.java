@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class CompoundArgument<Type> implements Argument<Type> {
+public class CompoundArgument<Type> implements Argument<Type> {
 
     protected final Map<InnerContainer, Converter<Type>> map = new HashMap<>();
     protected final String label;

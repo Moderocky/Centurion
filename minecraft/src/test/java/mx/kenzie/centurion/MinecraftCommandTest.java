@@ -22,6 +22,7 @@ public class MinecraftCommandTest extends MinecraftCommand {
         assert new MinecraftCommandTest().execute(null, "") != null;
         assert new MinecraftCommandTest().execute(new TestCommandSender(), "test") != null;
         assert new MinecraftCommandTest().execute(new TestCommandSender(), "test").successful();
+        assert new MinecraftCommandTest().execute(new TestCommandSender(), "test material " + Material.TUFF).successful();
     }
 
     @Test

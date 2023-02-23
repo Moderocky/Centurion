@@ -46,6 +46,7 @@ class ArgumentContainer {
         final List<Object> inputs = new ArrayList<>(8);
         for (Argument<?> argument : arguments) {
             final Argument.ParseResult result = argument.read(input);
+            if (result == null) return null;
             final String part = result.part(), remainder = result.remainder();
             if (part.isEmpty() && argument.optional()) {
                 inputs.add(argument.lapse());

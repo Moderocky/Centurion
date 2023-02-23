@@ -52,7 +52,9 @@ public class CommandTest extends Command<TestSender> {
         final TestSender sender = new TestSender();
         final Result result = this.execute(sender, input);
         assert result.successful();
-        assert Objects.equals("beans on toast", sender.output) : sender.output;
+        assert Objects.equals("greedy beans on toast", sender.output) : sender.output;
+        this.execute(sender, "test hello a b c d e");
+        assert Objects.equals("greedy a b c d e", sender.output) : sender.output;
     }
 
     @Test
@@ -120,8 +122,17 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void innerInput() {
+        final String input = "test first 64 second";
+        final TestSender sender = new TestSender();
+        final Result result = this.execute(sender, input);
+        assert result.successful();
+        assert Objects.equals("middle 64", sender.output) : sender.output;
+    }
+
+    @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello 12, test hello there, test hello <int>, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello 12, test hello there, test hello <int>, test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -130,6 +141,11 @@ public class CommandTest extends Command<TestSender> {
             .arg("general", OPTIONAL_STRING, (sender, arguments) -> {
                 assert !arguments.isEmpty();
                 sender.output = arguments.get(0);
+                return CommandResult.PASSED;
+            })
+            .arg("first", INTEGER, "second", (sender, arguments) -> {
+                assert !arguments.isEmpty();
+                sender.output = "middle " + arguments.get(0);
                 return CommandResult.PASSED;
             })
             .arg("hello", (sender, arguments) -> {
@@ -170,7 +186,7 @@ public class CommandTest extends Command<TestSender> {
             })
             .arg("hello", GREEDY_STRING, (sender, arguments) -> {
                 assert !arguments.isEmpty();
-                sender.output = arguments.get(0);
+                sender.output = "greedy " + arguments.get(0);
                 return CommandResult.PASSED;
             })
             .arg("hello", String.class, (sender, arguments) -> {

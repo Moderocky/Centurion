@@ -11,6 +11,18 @@ public abstract class Command<Sender> {
         this.behaviour = this.create();
     }
 
+    static List<Argument<?>> coerce(Collection<Object> arguments) {
+        final List<Argument<?>> list = new ArrayList<>(arguments.size());
+        for (Object argument : arguments) {
+            if (argument instanceof String string) list.add(new LiteralArgument(string));
+            else if (argument instanceof Argument<?> arg) list.add(arg);
+            else if (argument == Boolean.class) list.add(Arguments.BOOLEAN);
+            else if (argument == String.class) list.add(Arguments.STRING);
+            else throw new RuntimeException("Unknown argument acceptor provided. " + argument);
+        }
+        return list;
+    }
+
     public abstract Behaviour create();
 
     protected Behaviour command(String label, String... aliases) {
@@ -24,6 +36,7 @@ public abstract class Command<Sender> {
     public String[] patterns() {
         return behaviour.patterns();
     }
+
 
     @FunctionalInterface
     public interface Input<Sender> extends BiFunction<Sender, Arguments, Result> {
@@ -40,7 +53,6 @@ public abstract class Command<Sender> {
         }
 
     }
-
 
     @FunctionalInterface
     public interface EmptyInput<Sender> extends Input<Sender>, BiFunction<Sender, Arguments, Result> {
@@ -221,14 +233,7 @@ public abstract class Command<Sender> {
         }
 
         public Behaviour arg(Collection<Object> arguments, Input<Sender> function) {
-            final List<Argument<?>> list = new ArrayList<>(arguments.size());
-            for (Object argument : arguments) {
-                if (argument instanceof String string) list.add(new LiteralArgument(string));
-                else if (argument instanceof Argument<?> arg) list.add(arg);
-                else if (argument == Boolean.class) list.add(Arguments.BOOLEAN);
-                else if (argument == String.class) list.add(Arguments.STRING);
-                else throw new RuntimeException("Unknown argument acceptor provided. " + argument);
-            }
+            final List<Argument<?>> list = coerce(arguments);
             final ArgumentContainer container = new ArgumentContainer(list.toArray(new Argument[0]));
             this.arguments.add(container);
             this.functions.put(container, function);
@@ -286,4 +291,5 @@ public abstract class Command<Sender> {
             return lapse.apply(sender, new Arguments());
         }
     }
+
 }

@@ -90,6 +90,11 @@ public class CompoundArgument<Type> implements Argument<Type> {
         return null;
     }
 
+    @Override
+    public int weight() {
+        return Argument.super.weight() - 2;
+    }
+
     @FunctionalInterface
     public interface Converter<Result> extends Function<Arguments, Result> {
 

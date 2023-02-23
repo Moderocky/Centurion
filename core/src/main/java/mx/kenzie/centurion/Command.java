@@ -159,6 +159,19 @@ public abstract class Command<Sender> {
         }
 
         protected Execution match(String input) {
+            input = this.prepareArguments(input);
+            if (input.isEmpty()) return new Execution(lapse, new Arguments());
+            for (ArgumentContainer argument : arguments) {
+                final Object[] inputs = argument.check(input, passAllArguments);
+                if (inputs == null) continue;
+                final Input<Sender> function = functions.get(argument);
+                assert function != null;
+                return new Execution(function, new Arguments(inputs));
+            }
+            return new Execution(lapse, new Arguments());
+        }
+
+        private String prepareArguments(String input) {
             this.sort();
             remove_name:
             {
@@ -173,15 +186,7 @@ public abstract class Command<Sender> {
                     }
             }
             input = input.stripLeading();
-            if (input.isEmpty()) return new Execution(lapse, new Arguments());
-            for (ArgumentContainer argument : arguments) {
-                final Object[] inputs = argument.check(input, passAllArguments);
-                if (inputs == null) continue;
-                final Input<Sender> function = functions.get(argument);
-                assert function != null;
-                return new Execution(function, new Arguments(inputs));
-            }
-            return new Execution(lapse, new Arguments());
+            return input;
         }
 
         public Behaviour passAllArguments() {
@@ -267,20 +272,7 @@ public abstract class Command<Sender> {
         }
 
         public Result execute(Sender sender, String input) {
-            this.sort();
-            remove_name:
-            {
-                if (input.startsWith(label)) {
-                    input = input.substring(label.length());
-                    break remove_name;
-                }
-                for (String alias : aliases)
-                    if (input.startsWith(alias)) {
-                        input = input.substring(alias.length());
-                        break remove_name;
-                    }
-            }
-            input = input.stripLeading();
+            input = this.prepareArguments(input);
             if (input.isEmpty()) return lapse.apply(sender, new Arguments());
             for (ArgumentContainer argument : arguments) {
                 final Object[] inputs = argument.check(input, passAllArguments);

@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public class TestCommandSender implements CommandSender {
     public String output;
+    public Object raw;
 
     @Override
     public void sendMessage(@NotNull String message) {

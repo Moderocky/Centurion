@@ -3,6 +3,7 @@ package mx.kenzie.centurion;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
+import org.bukkit.util.Vector;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,9 +46,31 @@ public class MinecraftCommandTest extends MinecraftCommand {
         assert Objects.equals(sender.output, "false") : sender.output;
     }
 
+    @Test
+    public void vectorCompound() {
+        final TestCommandSender sender = new TestCommandSender();
+        final Result result = this.execute(sender, "test vector 10 5 4");
+        assert result.successful() : result;
+        assert result.error() == null : result.error().getMessage();
+        assert Objects.equals(sender.raw, new Vector(10, 5, 4)) : sender.raw;
+    }
+
+    @Test
+    public void vectorCompoundAlt() {
+        final TestCommandSender sender = new TestCommandSender();
+        final Result result = this.execute(sender, "test vector 10 meters up");
+        assert result.successful() : result;
+        assert result.error() == null : result.error().getMessage();
+        assert Objects.equals(sender.raw, new Vector(0, 10, 0)) : sender.raw;
+    }
+
     @Override
     public Command<CommandSender>.Behaviour create() {
         return command("test")
+            .arg("vector", VECTOR, (sender, arguments) -> {
+                ((TestCommandSender) sender).raw = arguments.<Vector>get(0);
+                return PASSED;
+            })
             .arg("face", BLOCK_FACE, (sender, arguments) -> {
                 sender.sendMessage(String.valueOf(arguments.<BlockFace>get(0)));
                 return PASSED;

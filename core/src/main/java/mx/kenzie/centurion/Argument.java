@@ -14,6 +14,15 @@ public interface Argument<Type> extends ArgumentFace {
         return null;
     }
 
+    default ParseResult read(String input) {
+        final int space = input.indexOf(' ');
+        if (this.plural() || space < 0) return new ParseResult(input.trim(), "");
+        else return new ParseResult(input.substring(0, space).trim(), input.substring(space + 1).stripLeading());
+    }
+
+    record ParseResult(String part, String remainder) {
+    }
+
 }
 
 interface ArgumentFace {

@@ -79,22 +79,20 @@ public abstract class Command<Sender> {
         public Object[] check(String input, boolean passAllArguments) {
             final List<Object> inputs = new ArrayList<>(8);
             for (Argument<?> argument : arguments) {
-                final String part;
-                final int space = input.indexOf(' ');
-                if (argument.plural() || space < 0) {
-                    part = input.trim();
-                    input = "";
-                } else {
-                    part = input.substring(0, space).trim();
-                    input = input.substring(space + 1).stripLeading();
-                }
+                final Argument.ParseResult result = argument.read(input);
+                final String part = result.part(), remainder = result.remainder();
                 if (part.isEmpty() && argument.optional()) {
                     inputs.add(argument.lapse());
+                    input = remainder;
                     continue;
                 }
                 if (!argument.matches(part)) return null;
-                if (!passAllArguments && argument.literal()) continue;
+                if (!passAllArguments && argument.literal()) {
+                    input = remainder;
+                    continue;
+                }
                 inputs.add(argument.parse(part));
+                input = remainder;
             }
             if (!input.isBlank()) return null;
             return inputs.toArray(new Object[0]);

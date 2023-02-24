@@ -302,6 +302,67 @@ they cannot be followed by another argument since there is nothing left to parse
 These are weighted very heavily by default to try and arrange them as the last option to be checked,
 but due to their nature they are prone to unwanted false positives and should be used carefully.
 
+### Compound Arguments
+
+The compound argument is a special feature of Centurion that allows a command input to function like a miniature
+grammar.
+A program may specify a compound argument, e.g. centurion-minecraft's `vector`, that is made from its own set of
+multi-argument structures.
+
+This argument may be used as normal within a command, e.g.
+
+```java
+class MyCommand extends Command<Player> {
+
+    @Override
+    public Behaviour create() {
+        return this.command("blob")
+            .arg("teleport", VECTOR, (player, arguments) -> {
+                final Vector vector = arguments.get(0);
+                player.teleportTo(vector);
+                return CommandResult.PASSED;
+            });
+    }
+
+}
+```
+
+This example would create the following command tree:
+
+```
+blob teleport <vector>  -> Teleports player
+```
+
+However, the compound `vector` argument may specify its own patterns, such as:
+
+```
+<number> meters <direction>
+<x> <y> <z>
+```
+
+Both of these are verified and then converted to a `Vector` using their own functions.
+This `Vector` is then passed back as the input for the command.
+
+In essence, the command's real tree would look like:
+
+```
+blob teleport <number> meters <direction>
+blob teleport <x> <y> <z>
+```
+
+However, the command does not need to manually parse the number and direction or x, y and z to a vector.
+
+This means that both the inputs `teleport 10 meters north` and `teleport 4 32 17` would provide a single `Vector` input
+to the same function.
+
+#### Compound Parsing Differences
+
+Compound arguments have a similar design and structure to commands themselves, and function as a sort of sub-command.
+However, the compound argument does not care about trailing input at the end.
+
+If a compound looks for `<number> meters` and the user inputs `10 meters south`,
+the remaining `south` will be sent back to the command parser to check against the next argument.
+
 ### Reading Patterns
 
 The full set of command patterns generated from a command is available in `command.patterns()`.
@@ -398,29 +459,36 @@ Centurion also supports automatic typing when retrieving an argument.
 ### Commander
 
 ```java
-command("test")
-    .arg("hello",
-        arg("there", sender -> {
-            System.out.println("General Kenobi!");
-        })
-    )
-    .arg("hello",
-        arg((sender, args) -> {
-            System.out.println("Hello, " + args[0] + "!");
-        }, new ArgString())
-    )
+class MyCommand extends Commander {
+   public Command create() {
+      return command("test")
+              .arg("hello",
+                      arg("there", sender -> {
+                         System.out.println("General Kenobi!");
+                      })
+              ).arg("hello",
+                      arg((sender, args) -> {
+                         System.out.println("Hello, " + args[0] + "!");
+                      }, new ArgString())
+              );
+   }
+}
 ```
 
 ### Centurion
 
 ```java
-command("test")
-    .arg("hello", "there", (sender, arguments) -> {
-        System.out.println("General Kenobi!");
-    })
-    .arg("hello", STRING, (sender, arguments) -> {
-        System.out.println("Hello, " + arguments.get(0) + "!");
-    })
+class MyCommand extends Command<Sender> {
+    public Behaviour<Sender> create() {
+        return command("test")
+            .arg("hello", "there", (sender, arguments) -> {
+                System.out.println("General Kenobi!");
+            })
+            .arg("hello", STRING, (sender, arguments) -> {
+                System.out.println("Hello, " + arguments.get(0) + "!");
+            });
+    }
+}
 ```
 
 ## Provided Domain Support

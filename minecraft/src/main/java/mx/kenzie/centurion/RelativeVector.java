@@ -5,6 +5,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+import java.util.Objects;
+
 public class RelativeVector extends Vector {
 
     private boolean relativeX, relativeY, relativeZ;
@@ -62,6 +64,23 @@ public class RelativeVector extends Vector {
 
     public boolean isRelativeZ() {
         return relativeZ;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj instanceof RelativeVector vector) {
+            if (relativeX != vector.relativeX) return false;
+            if (relativeY != vector.relativeY) return false;
+            if (relativeZ != vector.relativeZ) return false;
+        }
+        if (!(obj instanceof Vector vector)) return false;
+        return Math.abs(this.x - vector.getX()) < 1.0E-6 && Math.abs(this.y - vector.getY()) < 1.0E-6 && Math.abs(this.z - vector.getZ()) < 1.0E-6;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), relativeX, relativeY, relativeZ);
     }
 
 }

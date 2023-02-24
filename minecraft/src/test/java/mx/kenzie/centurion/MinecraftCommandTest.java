@@ -66,6 +66,20 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Test
+    public void offsetCompound() {
+        final TestCommandSender sender = new TestCommandSender();
+        final Result result = this.execute(sender, "test offset 10 ~5 ~-3");
+        assert result.successful() : result;
+        assert result.error() == null : result.error().getMessage();
+        assert Objects.equals(sender.raw, new Vector(10, 5, -3)) : sender.raw;
+        assert Objects.equals(sender.raw, new Vector(10, 5, -3)) : sender.raw;
+        final RelativeVector vector = (RelativeVector) sender.raw;
+        assert !vector.isRelativeX();
+        assert vector.isRelativeY();
+        assert vector.isRelativeZ();
+    }
+
+    @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns()).equals("[test, test vector <vector>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }
@@ -75,6 +89,10 @@ public class MinecraftCommandTest extends MinecraftCommand {
         return command("test")
             .arg("vector", VECTOR, (sender, arguments) -> {
                 ((TestCommandSender) sender).raw = arguments.<Vector>get(0);
+                return PASSED;
+            })
+            .arg("offset", OFFSET, (sender, arguments) -> {
+                ((TestCommandSender) sender).raw = arguments.<RelativeVector>get(0);
                 return PASSED;
             })
             .arg("face", BLOCK_FACE, (sender, arguments) -> {

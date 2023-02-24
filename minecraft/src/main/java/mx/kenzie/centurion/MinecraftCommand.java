@@ -31,9 +31,12 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
-    public static final Argument<org.bukkit.util.Vector> VECTOR = new CompoundArgument<Vector>("vector")
+    public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument();
+    public static final Argument<Vector> VECTOR = new CompoundArgument<Vector>("vector")
         .arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
+    public static final Argument<RelativeVector> OFFSET = new CompoundArgument<RelativeVector>("offset")
+        .arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"), arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)));
     protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
     protected String description, usage, permission;
     protected Component permissionMessage;

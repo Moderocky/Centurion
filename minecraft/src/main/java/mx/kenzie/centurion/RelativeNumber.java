@@ -9,6 +9,10 @@ public class RelativeNumber extends Number {
         this.relative = relative;
     }
 
+    public static RelativeNumber of(Number number) {
+        return new RelativeNumber(number, true);
+    }
+
     @Override
     public int intValue() {
         return number.intValue();

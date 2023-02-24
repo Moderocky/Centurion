@@ -38,6 +38,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
         final List<Argument<?>> list = Command.coerce(arguments);
         final InnerContainer container = new InnerContainer(list.toArray(new Argument[0]));
         this.map.put(container, result);
+        this.arguments.add(container);
         return this;
     }
 
@@ -57,7 +58,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
     public boolean matches(String input) {
         if (input.hashCode() == lastHash) return true;
         this.sort();
-        for (InnerContainer container : map.keySet()) {
+        for (InnerContainer container : arguments) {
             final InnerContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;
@@ -71,7 +72,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
     public Type parse(String input) {
         if (input.hashCode() == lastHash) return lastParser.apply(new Arguments(lastInputs));
         this.sort();
-        for (InnerContainer container : map.keySet()) {
+        for (InnerContainer container : arguments) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;
@@ -89,7 +90,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
     @Override
     public ParseResult read(String input) {
         this.sort();
-        for (InnerContainer container : map.keySet()) {
+        for (InnerContainer container : arguments) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;

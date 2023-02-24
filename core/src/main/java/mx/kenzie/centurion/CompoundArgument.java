@@ -1,15 +1,14 @@
 package mx.kenzie.centurion;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class CompoundArgument<Type> implements Argument<Type> {
 
     protected final Map<InnerContainer, Converter<Type>> map = new HashMap<>();
+    protected final List<InnerContainer> arguments = new ArrayList<>();
     protected final String label;
+    protected boolean sorted;
     protected int lastHash;
     protected Object[] lastInputs;
     protected Converter<Type> lastParser;
@@ -35,10 +34,17 @@ public class CompoundArgument<Type> implements Argument<Type> {
     }
 
     public CompoundArgument<Type> arg(Collection<Object> arguments, Converter<Type> result) {
+        this.sorted = false;
         final List<Argument<?>> list = Command.coerce(arguments);
         final InnerContainer container = new InnerContainer(list.toArray(new Argument[0]));
         this.map.put(container, result);
         return this;
+    }
+
+    protected void sort() {
+        if (sorted) return;
+        this.sorted = true;
+        this.arguments.sort(Comparator.comparing(ArgumentContainer::weight));
     }
 
     private void storeResult(InnerContainer.Result result, InnerContainer container) {
@@ -50,6 +56,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
     @Override
     public boolean matches(String input) {
         if (input.hashCode() == lastHash) return true;
+        this.sort();
         for (InnerContainer container : map.keySet()) {
             final InnerContainer.Result result = container.consume(input, false);
             if (result == null) continue;
@@ -63,6 +70,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
     @Override
     public Type parse(String input) {
         if (input.hashCode() == lastHash) return lastParser.apply(new Arguments(lastInputs));
+        this.sort();
         for (InnerContainer container : map.keySet()) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;
@@ -80,6 +88,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
 
     @Override
     public ParseResult read(String input) {
+        this.sort();
         for (InnerContainer container : map.keySet()) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;

@@ -47,19 +47,15 @@ class ArgumentContainer {
         for (Argument<?> argument : arguments) {
             final Argument.ParseResult result = argument.read(input);
             if (result == null) return null;
-            final String part = result.part(), remainder = result.remainder();
+            final String part = result.part();
+            input = result.remainder();
             if (part.isEmpty() && argument.optional()) {
                 inputs.add(argument.lapse());
-                input = remainder;
                 continue;
             }
             if (!argument.matches(part)) return null;
-            if (!passAllArguments && argument.literal()) {
-                input = remainder;
-                continue;
-            }
+            if (!passAllArguments && argument.literal()) continue;
             inputs.add(argument.parse(part));
-            input = remainder;
         }
         if (this.requireEmpty() && !input.isBlank()) return null;
         final String part = initial.substring(0, initial.length() - input.length()).trim();

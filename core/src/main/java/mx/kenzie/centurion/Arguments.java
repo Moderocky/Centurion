@@ -133,7 +133,7 @@ class ArgInteger extends HashedArg<Integer> {
     @Override
     public boolean matches(String input) {
         this.lastHash = input.hashCode();
-        for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
+        for (char c : input.toCharArray()) if ((c < '0' || c > '9') && c != '-') return false;
         try {
             this.lastValue = Integer.parseInt(input);
             return true;
@@ -157,7 +157,7 @@ class ArgLong extends HashedArg<Long> {
     @Override
     public boolean matches(String input) {
         this.lastHash = input.hashCode();
-        for (char c : input.toCharArray()) if (c < '0' || c > '9') return false;
+        for (char c : input.toCharArray()) if ((c < '0' || c > '9') && c != '-') return false;
         try {
             this.lastValue = Long.parseLong(input);
             return true;

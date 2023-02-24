@@ -92,6 +92,8 @@ public class CommandTest extends Command<TestSender> {
         assert result.successful();
         assert !Objects.equals("bad", sender.output) : sender.output;
         assert Objects.equals("int 12", sender.output) : sender.output;
+        this.execute(sender, "test hello -4");
+        assert Objects.equals("int -4", sender.output) : sender.output;
     }
 
     @Test

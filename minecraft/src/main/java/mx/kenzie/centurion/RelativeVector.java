@@ -26,6 +26,10 @@ public class RelativeVector extends Vector {
         return new RelativeVector(RelativeNumber.of(x), RelativeNumber.of(y), RelativeNumber.of(z));
     }
 
+    public static RelativeVector of(Vector vector) {
+        return ofAll(vector.getX(), vector.getY(), vector.getZ());
+    }
+
     public Location relativeTo(Entity entity) {
         return this.relativeTo(entity.getLocation());
     }

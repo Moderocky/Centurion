@@ -24,6 +24,22 @@ public class RelativeNumberTest {
 
     @Test
     public void longValue() {
+        assert new RelativeNumber(1, false).longValue() == 1;
+        assert new RelativeNumber(1, true).longValue() == 1;
+        assert new RelativeNumber(-44, true).longValue() == -44;
+        assert new RelativeNumber(-44, false).longValue() == -44;
+        assert new RelativeNumber(610023, true).longValue() == 610023;
+        assert new RelativeNumber(610023, false).longValue() == 610023;
+        assert new RelativeNumber(610023.5, true).longValue() == 610023;
+        assert new RelativeNumber(610023.9, false).longValue() == 610023;
+        assert new RelativeNumber(-2.0448111, true).longValue() == -2;
+        assert new RelativeNumber(-4.581922001, false).longValue() == -4;
+        assert new RelativeNumber(-4.001, false).longValue() == -4;
+        assert new RelativeNumber(-4.999, false).longValue() == -4;
+        assert new RelativeNumber(4.001, false).longValue() == 4;
+        assert new RelativeNumber(4.999, false).longValue() == 4;
+        assert new RelativeNumber(10000000000000L, false).longValue() == 10000000000000L;
+        assert new RelativeNumber(-10000000000000L, true).longValue() == -10000000000000L;
     }
 
     @Test

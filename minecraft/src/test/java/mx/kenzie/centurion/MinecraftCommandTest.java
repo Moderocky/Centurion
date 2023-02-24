@@ -7,6 +7,7 @@ import org.bukkit.util.Vector;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import static mx.kenzie.centurion.CommandResult.PASSED;
@@ -62,6 +63,11 @@ public class MinecraftCommandTest extends MinecraftCommand {
         assert result.successful() : result;
         assert result.error() == null : result.error().getMessage();
         assert Objects.equals(sender.raw, new Vector(0, 10, 0)) : sender.raw;
+    }
+
+    @Test
+    public void testPatterns() {
+        assert Arrays.toString(this.patterns()).equals("[test, test vector <vector>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }
 
     @Override

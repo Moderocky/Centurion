@@ -54,6 +54,12 @@ public class RelativeNumberTest {
 
     @Test
     public void doubleValue() {
+        assert new RelativeNumber(1, false).doubleValue() == 1;
+        assert new RelativeNumber(1, true).doubleValue() == 1;
+        assert new RelativeNumber(1.5, false).doubleValue() == 1.5;
+        assert new RelativeNumber(1.3, true).doubleValue() == 1.3;
+        assert new RelativeNumber(-1.5, false).doubleValue() == -1.5;
+        assert new RelativeNumber(-1.3, true).doubleValue() == -1.3;
     }
 
     @Test

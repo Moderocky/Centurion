@@ -25,7 +25,7 @@ public class EnumArgument<Type extends Enum<Type>> extends HashedArg<Type> {
         if (possibilities != null && possibilities.length > 0) return possibilities;
         final Type[] enums = type.getEnumConstants();
         this.possibilities = new String[enums.length];
-        for (int i = 0; i < enums.length; i++) possibilities[i] = enums[i].name();
+        for (int i = 0; i < enums.length; i++) possibilities[i] = enums[i].name().toLowerCase();
         return possibilities;
     }
 

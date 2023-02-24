@@ -64,9 +64,13 @@ public class RelativeNumberTest {
 
     @Test
     public void isRelative() {
+        assert !new RelativeNumber(1, false).isRelative();
+        assert new RelativeNumber(1, true).isRelative();
     }
 
     @Test
     public void getNumber() {
+        assert new RelativeNumber(1, true).getNumber().intValue() == 1;
     }
+
 }

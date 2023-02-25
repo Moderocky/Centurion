@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 class ArgumentContainer {
-    private final Argument<?>[] arguments;
+    protected final Argument<?>[] arguments;
 
     ArgumentContainer(Argument<?>... arguments) {
         this.arguments = arguments;

@@ -20,9 +20,10 @@ public class RelativeNumberArgument extends HashedArg<RelativeNumber> {
 
     @Override
     public RelativeNumber parseNew(String input) {
+        if (input.equals("~")) return new RelativeNumber(0, true);
         if (input.startsWith("~"))
             return new RelativeNumber(Double.parseDouble(input.substring(1)), true);
-        return new RelativeNumber(Double.parseDouble(input.trim()), false);
+        return new RelativeNumber(Double.parseDouble(input), false);
     }
 
 }

@@ -105,6 +105,13 @@ public class CompoundArgument<Type> implements Argument<Type> {
         return Argument.super.weight() - 2;
     }
 
+    @Override
+    public String[] possibilities() {
+        final List<String> list = new ArrayList<>(32);
+        for (InnerContainer argument : arguments) list.addAll(argument.possibilities());
+        return list.toArray(new String[0]);
+    }
+
     @FunctionalInterface
     public interface Converter<Result> extends Function<Arguments, Result> {
 
@@ -117,6 +124,31 @@ public class CompoundArgument<Type> implements Argument<Type> {
         InnerContainer(Argument<?>... arguments) {
             super(arguments);
         }
+
+        public List<String> possibilities() {
+            if (arguments.length == 0) return Collections.emptyList();
+            if (arguments.length == 1) return List.of(arguments[0].possibilities());
+            final String[] strings = arguments[0].possibilities();
+            if (strings.length < 1) return Collections.emptyList();
+            final List<String> possibilities = new ArrayList<>(24);
+            for (String possibility : arguments[0].possibilities()) this.scrape(possibility, 1, possibilities);
+            return possibilities;
+        }
+
+        private void scrape(String bit, int index, List<String> possibilities) {
+            final Argument<?> argument = arguments[index++];
+            final String[] strings = argument.possibilities();
+            if (strings.length < 1) {
+                possibilities.add(bit);
+                return;
+            }
+            for (String possibility : strings) {
+                final String stub = bit + ' ' + possibility;
+                if (arguments.length > index) this.scrape(stub, index, possibilities);
+                else possibilities.add(stub);
+            }
+        }
+
     }
 
 }

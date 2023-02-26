@@ -33,25 +33,21 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final Argument<Vector> VECTOR = new CompoundArgument<Vector>("vector")
         .arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
+    public static final Argument<Location> LOCATION = new CompoundArgument<Location>("location")
+        .arg(VECTOR, "in", WORLD, arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
+        .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
+        .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
     public static final Argument<RelativeVector> OFFSET = new CompoundArgument<RelativeVector>("offset")
         .arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"), arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
     public static final Argument<LocalVector> LOCAL_OFFSET = new CompoundArgument<LocalVector>("local")
         .arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"), LOCAL_NUMBER.labelled("forwards"), arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
-    public static final Argument<Location> LOCATION = new CompoundArgument<Location>("location")
-        .arg(List.of(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), "in", WORLD), arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
-        .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
-        .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
     protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
 
     static {
         ((CompoundArgument<Location>) LOCATION)
-            .arg(List.of(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), "of", PLAYER), arguments -> arguments.<Player>get(2).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(List.of(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), "of", LOCATION), arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(List.of(Arguments.DOUBLE, "meters", "above", PLAYER), arguments -> arguments.<Player>get(2).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(List.of(Arguments.DOUBLE, "meters", "above", LOCATION), arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(List.of(Arguments.DOUBLE, "meters", "below", PLAYER), arguments -> arguments.<Player>get(2).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(List.of(Arguments.DOUBLE, "meters", "below", LOCATION), arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+            .arg(OFFSET, "of", PLAYER, arguments -> arguments.<Player>get(2).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
+            .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
     }
 
     protected String description, usage, permission;

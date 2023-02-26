@@ -133,6 +133,21 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void stressTestGreedy() {
+        final TestSender sender = new TestSender();
+        assert this.execute(sender, "hello hello there").successful();
+        assert Objects.equals("greedy hello there", sender.output) : sender.output;
+        assert this.execute(sender, "hello c there").successful();
+        assert Objects.equals("greedy c there", sender.output) : sender.output;
+        assert this.execute(sender, "test hello c there").successful();
+        assert Objects.equals("greedy c there", sender.output) : sender.output;
+        assert this.execute(sender, "test hello blob blob blob blob blob").successful();
+        assert Objects.equals("greedy blob blob blob blob blob", sender.output) : sender.output;
+        assert this.execute(sender, "test hello 10").successful();
+        assert Objects.equals("int 10", sender.output) : sender.output;
+    }
+
+    @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello 12, test hello there, test hello <int>, test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
     }

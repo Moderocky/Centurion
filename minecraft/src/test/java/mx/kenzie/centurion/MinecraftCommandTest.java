@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static mx.kenzie.centurion.CommandResult.LAPSED;
 import static mx.kenzie.centurion.CommandResult.PASSED;
 
 public class MinecraftCommandTest extends MinecraftCommand {
@@ -72,7 +73,6 @@ public class MinecraftCommandTest extends MinecraftCommand {
         assert result.successful() : result;
         assert result.error() == null : result.error().getMessage();
         assert Objects.equals(sender.raw, new Vector(10, 5, -3)) : sender.raw;
-        assert Objects.equals(sender.raw, new Vector(10, 5, -3)) : sender.raw;
         final RelativeVector vector = (RelativeVector) sender.raw;
         assert !vector.isRelativeX();
         assert vector.isRelativeY();
@@ -80,8 +80,22 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Test
+    public void localCompound() {
+        final TestCommandSender sender = new TestCommandSender();
+        final Result result = this.execute(sender, "test local ^ ^2 ^0");
+        assert result.successful() : result;
+        assert result.error() == null : result.error().getMessage();
+        assert Objects.equals(sender.raw, new Vector(0, 2, 0)) : sender.raw;
+        final LocalVector vector = (LocalVector) sender.raw;
+        assert vector.isRelativeX();
+        assert vector.isRelativeY();
+        assert vector.isRelativeZ();
+        assert this.execute(sender, "test local ^ 2 ^0").type() == LAPSED;
+    }
+
+    @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test vector <vector>, test offset <offset>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test vector <vector>, test offset <offset>, test local <local>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -93,6 +107,10 @@ public class MinecraftCommandTest extends MinecraftCommand {
             })
             .arg("offset", OFFSET, (sender, arguments) -> {
                 ((TestCommandSender) sender).raw = arguments.<RelativeVector>get(0);
+                return PASSED;
+            })
+            .arg("local", LOCAL_OFFSET, (sender, arguments) -> {
+                ((TestCommandSender) sender).raw = arguments.<LocalVector>get(0);
                 return PASSED;
             })
             .arg("face", BLOCK_FACE, (sender, arguments) -> {

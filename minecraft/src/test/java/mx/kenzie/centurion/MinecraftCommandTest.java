@@ -108,4 +108,5 @@ public class MinecraftCommandTest extends MinecraftCommand {
                 return PASSED;
             });
     }
+
 }

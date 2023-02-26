@@ -28,13 +28,16 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
-    public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument();
+    public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument(),
+        LOCAL_NUMBER = new LocalNumberArgument();
     public static final Argument<Vector> VECTOR = new CompoundArgument<Vector>("vector")
         .arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
     public static final Argument<RelativeVector> OFFSET = new CompoundArgument<RelativeVector>("offset")
         .arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"), arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+    public static final Argument<LocalVector> LOCAL_OFFSET = new CompoundArgument<LocalVector>("local")
+        .arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"), LOCAL_NUMBER.labelled("forwards"), arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
     public static final Argument<Location> LOCATION = new CompoundArgument<Location>("location")
         .arg(List.of(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), "in", WORLD), arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
@@ -112,7 +115,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             builder.append(line);
         }
         sender.sendMessage(builder.build());
-        return CommandResult.PASSED;
+        return CommandResult.LAPSED;
     }
 
     private Component print(ArgumentContainer container) {

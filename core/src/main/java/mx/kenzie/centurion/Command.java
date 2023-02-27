@@ -5,6 +5,7 @@ import java.util.function.BiFunction;
 
 public abstract class Command<Sender> {
 
+    private static final ThreadLocal<Object> context = new ThreadLocal<>();
     protected final Behaviour behaviour;
 
     protected Command() {
@@ -23,6 +24,19 @@ public abstract class Command<Sender> {
         return list;
     }
 
+    /**
+     * Command context is available during the parsing and execution phase, and discarded once complete.
+     * This is a thread-safe value and a strong reference.
+     */
+    @SuppressWarnings("unchecked")
+    public static <Sender> Command<Sender>.Context getContext() {
+        return (Command<Sender>.Context) context.get();
+    }
+
+    protected static void setContext(Command<?>.Context context) {
+        Command.context.set(context);
+    }
+
     public abstract Behaviour create();
 
     protected Behaviour command(String label, String... aliases) {
@@ -37,7 +51,7 @@ public abstract class Command<Sender> {
         return behaviour.patterns();
     }
 
-
+    //<editor-fold desc="Input" defaultstate="collapsed">
     @FunctionalInterface
     public interface Input<Sender> extends BiFunction<Sender, Arguments, Result> {
 
@@ -66,16 +80,6 @@ public abstract class Command<Sender> {
 
     }
 
-    protected class Execution {
-        protected final Input<Sender> function;
-        protected final Arguments arguments;
-
-        protected Execution(Input<Sender> function, Arguments arguments) {
-            this.function = function;
-            this.arguments = arguments;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public class Behaviour {
         public static final Input<?> DEFAULT_LAPSE = (sender, arguments) -> CommandResult.NO_BEHAVIOUR;
@@ -94,19 +98,6 @@ public abstract class Command<Sender> {
             this.aliases = new HashSet<>(List.of(aliases));
             this.arguments = new LinkedList<>();
             this.functions = new LinkedHashMap<>();
-        }
-
-        protected Execution match(String input) {
-            input = this.prepareArguments(input);
-            if (input.isEmpty()) return new Execution(lapse, new Arguments());
-            for (ArgumentContainer argument : arguments) {
-                final Object[] inputs = argument.check(input, passAllArguments);
-                if (inputs == null) continue;
-                final Input<Sender> function = functions.get(argument);
-                assert function != null;
-                return new Execution(function, new Arguments(inputs));
-            }
-            return new Execution(lapse, new Arguments());
         }
 
         private String prepareArguments(String input) {
@@ -203,19 +194,44 @@ public abstract class Command<Sender> {
         }
 
         public Result execute(Sender sender, String input) {
-            input = this.prepareArguments(input);
-            if (input.isEmpty()) return lapse.apply(sender, new Arguments());
-            for (ArgumentContainer argument : arguments) {
-                final Object[] inputs = argument.check(input, passAllArguments);
-                if (inputs == null) continue;
-                final Input<Sender> function = functions.get(argument);
-                assert function != null;
-                final Result result = function.apply(sender, new Arguments(inputs));
-                if (result.type().endParsing) return result;
-                if (result == CommandResult.LAPSE) break;
+            Command.setContext(new Context(sender, input));
+            try {
+                input = this.prepareArguments(input);
+                if (input.isEmpty()) return lapse.apply(sender, new Arguments());
+                for (ArgumentContainer argument : arguments) {
+                    final Object[] inputs = argument.check(input, passAllArguments);
+                    if (inputs == null) continue;
+                    final Input<Sender> function = functions.get(argument);
+                    assert function != null;
+                    final Result result = function.apply(sender, new Arguments(inputs));
+                    if (result.type().endParsing) return result;
+                    if (result == CommandResult.LAPSE) break;
+                }
+                return lapse.apply(sender, new Arguments());
+            } finally {
+                Command.setContext(null);
             }
-            return lapse.apply(sender, new Arguments());
         }
+    }
+
+    public class Context {
+
+        protected final Sender sender;
+        protected final String rawInput;
+
+        public Context(Sender sender, String input) {
+            this.sender = sender;
+            this.rawInput = input;
+        }
+
+        public Sender getSender() {
+            return sender;
+        }
+
+        public String getRawInput() {
+            return rawInput;
+        }
+
     }
 
 }

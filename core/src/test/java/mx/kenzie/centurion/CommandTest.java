@@ -20,6 +20,25 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void context() {
+        final Object sender = "Foo";
+        final Command<Object> command = new Command<>() {
+            @Override
+            public Command<Object>.Behaviour create() {
+                return command("blob").arg("test", (o, arguments) -> {
+                    assert Command.getContext() != null;
+                    assert Command.getContext().getSender() == sender;
+                    return Command.getContext().getSender() == sender ? CommandResult.PASSED : CommandResult.FAILED_UNKNOWN;
+                });
+            }
+        };
+        final Result result = command.execute(sender, "blob test");
+        assert result != null;
+        assert result.successful();
+        assert result.type() == CommandResult.PASSED;
+    }
+
+    @Test
     public void basic() {
         final String input = "test";
         final TestSender sender = new TestSender();

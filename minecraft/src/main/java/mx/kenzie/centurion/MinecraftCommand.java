@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -24,6 +25,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final EnumArgument<BlockFace> BLOCK_FACE = new EnumArgument<>(BlockFace.class);
     public static final EnumArgument<Material> MATERIAL = new EnumArgument<>(Material.class);
     public static final EnumArgument<EntityType> ENTITY_TYPE = new EnumArgument<>(EntityType.class);
+    public static final TypedArgument<TextColor> COLOR = new ColorArgument().labelled("color");
     public static final TypedArgument<BlockData> BLOCK_DATA = new BlockDataArgument();
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
     public static final TypedArgument<Selector> SELECTOR = new SelectorArgument().labelled("entity");

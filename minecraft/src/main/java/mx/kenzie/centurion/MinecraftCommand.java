@@ -26,6 +26,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final EnumArgument<EntityType> ENTITY_TYPE = new EnumArgument<>(EntityType.class);
     public static final TypedArgument<BlockData> BLOCK_DATA = new BlockDataArgument();
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
+    public static final TypedArgument<Selector> SELECTOR = new SelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
     public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument(),

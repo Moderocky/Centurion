@@ -18,7 +18,11 @@ public class Selector {
     }
 
     protected boolean verify() {
-        if (sender == null) sender = Bukkit.getConsoleSender();
+        if (sender == null) {
+            final Command<?>.Context context = Command.getContext();
+            if (context != null && context.getSender() instanceof CommandSender sender) this.sender = sender;
+            else sender = Bukkit.getConsoleSender();
+        }
         try {
             this.list = Bukkit.selectEntities(sender, selector);
             return true;

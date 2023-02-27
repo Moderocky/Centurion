@@ -1,5 +1,8 @@
 package mx.kenzie.centurion;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -94,8 +97,19 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Test
+    public void colorArgument() {
+        final TestCommandSender sender = new TestCommandSender();
+        final Result result = this.execute(sender, "test color #ff0000");
+        assert result.successful() : result;
+        assert result.error() == null : result.error().getMessage();
+        assert Objects.equals(sender.raw, TextColor.fromCSSHexString("#ff0000")) : sender.output;
+        assert this.execute(sender, "test color dark_purple").successful();
+        assert Objects.equals(sender.raw, NamedTextColor.DARK_PURPLE) : sender.output;
+    }
+
+    @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test vector <vector>, test offset <offset>, test local <local>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test vector <vector>, test offset <offset>, test local <local>, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -111,6 +125,10 @@ public class MinecraftCommandTest extends MinecraftCommand {
             })
             .arg("local", LOCAL_OFFSET, (sender, arguments) -> {
                 ((TestCommandSender) sender).raw = arguments.<LocalVector>get(0);
+                return PASSED;
+            })
+            .arg("color", COLOR, (sender, arguments) -> {
+                ((TestCommandSender) sender).raw = arguments.<Color>get(0);
                 return PASSED;
             })
             .arg("face", BLOCK_FACE, (sender, arguments) -> {

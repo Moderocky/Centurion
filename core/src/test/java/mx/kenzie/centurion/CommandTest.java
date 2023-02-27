@@ -22,6 +22,7 @@ public class CommandTest extends Command<TestSender> {
     @Test
     public void context() {
         final Object sender = "Foo";
+        assert Command.getContext() == null;
         final Command<Object> command = new Command<>() {
             @Override
             public Command<Object>.Behaviour create() {
@@ -32,7 +33,9 @@ public class CommandTest extends Command<TestSender> {
                 });
             }
         };
+        assert Command.getContext() == null;
         final Result result = command.execute(sender, "blob test");
+        assert Command.getContext() == null;
         assert result != null;
         assert result.successful();
         assert result.type() == CommandResult.PASSED;

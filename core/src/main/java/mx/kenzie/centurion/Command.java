@@ -105,16 +105,24 @@ public abstract class Command<Sender> {
             remove_name:
             {
                 if (input.startsWith(label)) {
-                    input = input.substring(label.length());
+                    if (input.length() == label.length()) {
+                        input = "";
+                        break remove_name;
+                    }
+                    input = input.substring(label.length() + 1);
                     break remove_name;
                 }
                 for (String alias : aliases)
                     if (input.startsWith(alias)) {
-                        input = input.substring(alias.length());
+                        if (input.length() == alias.length()) {
+                            input = "";
+                            break remove_name;
+                        }
+                        input = input.substring(alias.length() + 1);
                         break remove_name;
                     }
             }
-            input = input.stripLeading();
+            input = input.trim();
             return input;
         }
 

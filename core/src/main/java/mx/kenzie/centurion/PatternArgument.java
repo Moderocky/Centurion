@@ -1,9 +1,10 @@
 package mx.kenzie.centurion;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PatternArgument extends HashedArg<ArgumentContainer> {
+    protected Map<String, ArgumentContainer> model;
+
     public PatternArgument() { // todo argument argument ?
         super(ArgumentContainer.class);
         this.label = "pattern";
@@ -16,10 +17,7 @@ public class PatternArgument extends HashedArg<ArgumentContainer> {
             @Override
             protected Map<String, ArgumentContainer> getArguments() {
                 if (map != null) return map;
-                this.map = new HashMap<>();
-                for (ArgumentContainer argument : containers)
-                    this.map.put(argument.toString(), argument);
-                return map;
+                return map = this.createMap(List.of(containers));
             }
         };
     }
@@ -31,12 +29,15 @@ public class PatternArgument extends HashedArg<ArgumentContainer> {
             @Override
             protected Map<String, ArgumentContainer> getArguments() {
                 if (map != null) return map;
-                this.map = new HashMap<>();
-                for (ArgumentContainer argument : command.behaviour.arguments)
-                    this.map.put(argument.toString(), argument);
-                return map;
+                return map = this.createMap(command.behaviour.arguments);
             }
         };
+    }
+
+    protected Map<String, ArgumentContainer> createMap(Collection<ArgumentContainer> arguments) {
+        final Map<String, ArgumentContainer> map = new HashMap<>();
+        for (ArgumentContainer argument : arguments) map.put(argument.toString().trim(), argument);
+        return map;
     }
 
     @Override
@@ -49,23 +50,38 @@ public class PatternArgument extends HashedArg<ArgumentContainer> {
 
     @Override
     public ArgumentContainer parseNew(String input) {
-        final Command<?>.Context context = Command.getContext();
-        if (context == null) return null;
-        return this.getArguments().get(input);
+        try {
+            final Command<?>.Context context = Command.getContext();
+            if (context == null) return null;
+            return this.getArguments().get(input);
+        } finally {
+            this.model = null;
+        }
+    }
+
+    @Override
+    public ParseResult read(String input) {
+        this.model = this.getArguments();
+        for (String pattern : model.keySet()) {
+            if (!input.startsWith(pattern)) continue;
+            return new ParseResult(input.substring(0, pattern.length()), input.substring(pattern.length()));
+        }
+        return null;
     }
 
     protected Map<String, ArgumentContainer> getArguments() {
-        final Map<String, ArgumentContainer> map = new HashMap<>();
-        for (ArgumentContainer argument : Command.getContext().getCommand().behaviour.arguments)
-            map.put(argument.toString(), argument);
-        return map;
+        if (model != null) return model;
+        return this.createMap(Command.getContext().getCommand().behaviour.arguments);
     }
 
     @Override
     public String[] possibilities() {
         final Command<?>.Context context = Command.getContext();
         if (context == null) return new String[0];
-        return context.getCommand().behaviour.patterns;
+        final Collection<ArgumentContainer> containers = context.getCommand().behaviour.arguments;
+        final List<String> list = new ArrayList<>(containers.size());
+        for (ArgumentContainer argument : containers) list.add(argument.toString().trim());
+        return list.toArray(new String[0]);
     }
 
 }

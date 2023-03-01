@@ -5,9 +5,20 @@ import java.util.Map;
 
 public class ArgumentArgument extends TypedArgument<Argument> {
 
+    protected final HashMap<String, Argument<?>> defaultArguments;
+
     public ArgumentArgument() {
         super(Argument.class);
         this.label = "argument";
+        this.defaultArguments = new HashMap<>();
+        this.registerDefault(Arguments.BOOLEAN);
+        this.registerDefault(Arguments.DOUBLE);
+        this.registerDefault(Arguments.LONG);
+        this.registerDefault(Arguments.INTEGER);
+        this.registerDefault(Arguments.STRING);
+        this.registerDefault(Arguments.CLASS);
+        this.registerDefault(Arguments.PATTERN);
+        this.registerDefault(this);
     }
 
     public static ArgumentArgument of(Argument<?>... arguments) {
@@ -38,6 +49,10 @@ public class ArgumentArgument extends TypedArgument<Argument> {
         };
     }
 
+    protected void registerDefault(Argument<?> argument) {
+        this.defaultArguments.put(argument.label(), argument);
+    }
+
     @Override
     public boolean matches(String input) {
         return this.getArguments().containsKey(input);
@@ -49,7 +64,7 @@ public class ArgumentArgument extends TypedArgument<Argument> {
     }
 
     protected Map<String, Argument<?>> getArguments() {
-        final Map<String, Argument<?>> map = new HashMap<>();
+        final Map<String, Argument<?>> map = new HashMap<>(defaultArguments);
         final Command<?>.Context context = Command.getContext();
         if (context == null) return map;
         final Command<?> command = Command.getContext().getCommand();

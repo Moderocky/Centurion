@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Arguments implements Iterable<Object> {
+    public static final TypedArgument<ArgumentContainer> PATTERN = new PatternArgument();
     public static final TypedArgument<Class> CLASS = new ArgClass();
     public static final TypedArgument<Class> OPTIONAL_CLASS = CLASS.asOptional();
     public static final TypedArgument<Integer> INTEGER = new ArgInteger();
@@ -34,6 +35,7 @@ public class Arguments implements Iterable<Object> {
         }
 
     };
+    public static final TypedArgument<Argument> ARGUMENT = new ArgumentArgument();
 
     private final List<Object> values;
 

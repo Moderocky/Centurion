@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static mx.kenzie.centurion.Arguments.ARGUMENT;
+import static mx.kenzie.centurion.Arguments.PATTERN;
 
 public class ArgumentTest extends Command<TestSender> {
 
@@ -38,6 +39,27 @@ public class ArgumentTest extends Command<TestSender> {
         assert result.successful();
         assert result.type() == CommandResult.PASSED;
         assert Objects.equals("argument <argument>", sender.output) : sender.output;
+    }
+
+    @Test
+    public void self() {
+        final Command<TestSender> command = new Command<>() {
+            @Override
+            public Command<TestSender>.Behaviour create() {
+                return command("test").arg(PATTERN, (sender, arguments) -> {
+                    sender.output = "yes";
+                    return CommandResult.PASSED;
+                });
+            }
+        };
+        final String input = "test <pattern>";
+        final TestSender sender = new TestSender();
+        final Result result = command.execute(sender, input);
+        assert result.successful();
+        assert result.type() == CommandResult.PASSED;
+        assert Objects.equals("yes", sender.output) : sender.output;
+        assert command.patterns().length == 1 : Arrays.toString(command.patterns());
+        assert command.patterns()[0].equals("test <pattern>");
     }
 
     @Test

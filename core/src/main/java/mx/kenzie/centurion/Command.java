@@ -240,6 +240,10 @@ public abstract class Command<Sender> {
             return rawInput;
         }
 
+        public Command<Sender> getCommand() {
+            return Command.this;
+        }
+
     }
 
 }

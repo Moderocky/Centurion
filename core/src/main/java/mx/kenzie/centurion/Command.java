@@ -170,10 +170,15 @@ public abstract class Command<Sender> {
             if (sorted) return;
             this.sorted = true;
             this.arguments.sort(Comparator.comparing(ArgumentContainer::weight));
-            this.patterns = new String[arguments.size() + 1];
-            this.patterns[0] = label;
             int index = 0;
-            for (ArgumentContainer argument : arguments) patterns[++index] = label + argument.toString();
+            if (lapse != DEFAULT_LAPSE) {
+                this.patterns = new String[arguments.size() + 1];
+                this.patterns[0] = label;
+                for (ArgumentContainer argument : arguments) patterns[++index] = label + argument.toString();
+            } else {
+                this.patterns = new String[arguments.size()];
+                for (ArgumentContainer argument : arguments) patterns[index++] = label + argument.toString();
+            }
         }
 
         public String[] patterns() {

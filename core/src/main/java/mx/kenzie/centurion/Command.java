@@ -51,6 +51,19 @@ public abstract class Command<Sender> {
         return behaviour.patterns();
     }
 
+    public String label() {
+        return behaviour.label;
+    }
+
+    public Set<String> aliases() {
+        return new HashSet<>(behaviour.aliases);
+    }
+
+    public Collection<ArgumentContainer> arguments() {
+        this.behaviour.sort();
+        return new ArrayList<>(behaviour.arguments);
+    }
+
     //<editor-fold desc="Input" defaultstate="collapsed">
     @FunctionalInterface
     public interface Input<Sender> extends BiFunction<Sender, Arguments, Result> {

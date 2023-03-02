@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class ArgumentContainer {
+public class ArgumentContainer {
     protected final Argument<?>[] arguments;
 
-    ArgumentContainer(Argument<?>... arguments) {
+    protected ArgumentContainer(Argument<?>... arguments) {
         this.arguments = arguments;
     }
 
@@ -97,6 +97,5 @@ class ArgumentContainer {
 
     protected record Result(String part, String remainder, Object... inputs) {
     }
-
 
 }

@@ -117,19 +117,25 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         return CommandResult.LAPSED;
     }
 
-    private Component print(ArgumentContainer container) {
-        final ColorProfile profile = this.getProfile();
+    protected Component print(ArgumentContainer container) {
         final TextComponent.Builder builder = Component.text();
         for (Argument<?> argument : container.arguments()) {
             builder.append(Component.space());
-            final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
-            if (optional) builder.append(Component.text('[', profile.pop()));
-            else if (!literal) builder.append(Component.text('<', profile.pop()));
-            builder.append(Component.text(argument.label(), profile.highlight()));
-            if (plural) builder.append(Component.text("...", profile.dark()));
-            if (optional) builder.append(Component.text(']', profile.pop()));
-            else if (!literal) builder.append(Component.text('>', profile.pop()));
+            builder.append(this.print(argument));
         }
+        return builder.build();
+    }
+
+    protected Component print(Argument<?> argument) {
+        final ColorProfile profile = this.getProfile();
+        final TextComponent.Builder builder = Component.text();
+        final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
+        if (optional) builder.append(Component.text('[', profile.pop()));
+        else if (!literal) builder.append(Component.text('<', profile.pop()));
+        builder.append(Component.text(argument.label(), profile.highlight()));
+        if (plural) builder.append(Component.text("...", profile.dark()));
+        if (optional) builder.append(Component.text(']', profile.pop()));
+        else if (!literal) builder.append(Component.text('>', profile.pop()));
         return builder.build();
     }
 

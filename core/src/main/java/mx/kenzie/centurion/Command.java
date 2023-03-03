@@ -3,10 +3,11 @@ package mx.kenzie.centurion;
 import java.util.*;
 import java.util.function.BiFunction;
 
-public abstract class Command<Sender> {
+public abstract class Command<Sender> implements Described {
 
     private static final ThreadLocal<Object> context = new ThreadLocal<>();
     protected final Behaviour behaviour;
+    protected String description;
 
     protected Command() {
         this.behaviour = this.create();
@@ -51,6 +52,11 @@ public abstract class Command<Sender> {
         return behaviour.patterns();
     }
 
+    @Override
+    public String description() {
+        return description;
+    }
+
     public String label() {
         return behaviour.label;
     }
@@ -64,7 +70,6 @@ public abstract class Command<Sender> {
         return new ArrayList<>(behaviour.arguments);
     }
 
-    //<editor-fold desc="Input" defaultstate="collapsed">
     @FunctionalInterface
     public interface Input<Sender> extends BiFunction<Sender, Arguments, Result> {
 
@@ -202,14 +207,14 @@ public abstract class Command<Sender> {
         @Override
         public String toString() {
             return "Behaviour{" +
-                "label='" + label + '\'' +
-                ", aliases=" + aliases +
-                ", functions=" + functions +
-                ", arguments=" + arguments +
-                ", lapse=" + lapse +
-                ", sorted=" + sorted +
-                ", patterns=" + Arrays.toString(patterns) +
-                '}';
+                    "label='" + label + '\'' +
+                    ", aliases=" + aliases +
+                    ", functions=" + functions +
+                    ", arguments=" + arguments +
+                    ", lapse=" + lapse +
+                    ", sorted=" + sorted +
+                    ", patterns=" + Arrays.toString(patterns) +
+                    '}';
         }
 
         @Override

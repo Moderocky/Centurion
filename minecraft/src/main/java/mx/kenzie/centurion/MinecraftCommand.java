@@ -136,7 +136,9 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         if (plural) builder.append(Component.text("...", profile.dark()));
         if (optional) builder.append(Component.text(']', profile.pop()));
         else if (!literal) builder.append(Component.text('>', profile.pop()));
-        return builder.build();
+        final Component component = builder.build();
+        if (argument.description() == null) return component;
+        return component.hoverEvent(Component.text(argument.description()));
     }
 
     @Override
@@ -179,7 +181,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             final Iterator<String> iterator = options.iterator();
             while (iterator.hasNext()) {
                 final String next = iterator.next();
-                if (next.toLowerCase().startsWith(current)) continue;
+                if (current.length() < 4) if (next.toLowerCase().startsWith(current)) continue;
+                else if (next.toLowerCase().contains(current)) continue;
                 iterator.remove();
             }
         }

@@ -78,6 +78,12 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
         return argument;
     }
 
+    public TypedArgument<Type> described(String description) {
+        final TypedArgument<Type> argument = this.clone();
+        argument.description = description;
+        return argument;
+    }
+
     public TypedArgument<Type> possible(String... options) {
         final TypedArgument<Type> argument = this.clone();
         argument.possibilities = options;

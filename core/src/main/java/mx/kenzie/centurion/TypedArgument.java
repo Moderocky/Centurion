@@ -7,10 +7,16 @@ public abstract class TypedArgument<Type> implements Argument<Type>, Cloneable {
     protected Type lapse = null;
     protected String label;
     protected String[] possibilities = new String[0];
+    protected String description;
 
     public TypedArgument(Class<Type> type) {
         this.type = type;
         this.label = type.getSimpleName().toLowerCase();
+    }
+
+    @Override
+    public String description() {
+        return description;
     }
 
     @Override

@@ -181,8 +181,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             final Iterator<String> iterator = options.iterator();
             while (iterator.hasNext()) {
                 final String next = iterator.next();
-                if (current.length() < 4) if (next.toLowerCase().startsWith(current)) continue;
-                else if (next.toLowerCase().contains(current)) continue;
+                if (next.toLowerCase().startsWith(current)) continue;
                 iterator.remove();
             }
         }

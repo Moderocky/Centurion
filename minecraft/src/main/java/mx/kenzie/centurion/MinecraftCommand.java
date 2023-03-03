@@ -53,7 +53,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
     }
 
-    protected String description, usage, permission;
+    protected String usage, permission;
     protected Component permissionMessage;
 
     {

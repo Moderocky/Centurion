@@ -157,6 +157,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String... args) {
         final List<String> options = new ArrayList<>();
+        Command.setContext(new Context(sender, String.join(" ", args)));
         if (args.length < 1) for (ArgumentContainer argument : this.behaviour.arguments) {
             options.addAll(List.of(argument.arguments()[0].possibilities()));
         }
@@ -185,6 +186,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 iterator.remove();
             }
         }
+        Command.setContext(null);
         return options;
     }
 

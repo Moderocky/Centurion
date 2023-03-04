@@ -77,4 +77,10 @@ public class ArgumentArgument extends TypedArgument<Argument> {
         for (Argument<?> argument : container.arguments) map.put(argument.label(), argument);
     }
 
+    @Override
+    public String[] possibilities() {
+        if (possibilities != null && possibilities.length > 0) return possibilities;
+        return this.getArguments().keySet().toArray(new String[0]);
+    }
+
 }

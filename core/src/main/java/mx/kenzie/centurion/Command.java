@@ -207,14 +207,14 @@ public abstract class Command<Sender> implements Described {
         @Override
         public String toString() {
             return "Behaviour{" +
-                    "label='" + label + '\'' +
-                    ", aliases=" + aliases +
-                    ", functions=" + functions +
-                    ", arguments=" + arguments +
-                    ", lapse=" + lapse +
-                    ", sorted=" + sorted +
-                    ", patterns=" + Arrays.toString(patterns) +
-                    '}';
+                "label='" + label + '\'' +
+                ", aliases=" + aliases +
+                ", functions=" + functions +
+                ", arguments=" + arguments +
+                ", lapse=" + lapse +
+                ", sorted=" + sorted +
+                ", patterns=" + Arrays.toString(patterns) +
+                '}';
         }
 
         @Override
@@ -249,6 +249,7 @@ public abstract class Command<Sender> implements Described {
 
         protected final Sender sender;
         protected final String rawInput;
+        protected List<Object> arguments;
 
         public Context(Sender sender, String input) {
             this.sender = sender;
@@ -265,6 +266,10 @@ public abstract class Command<Sender> implements Described {
 
         public Command<Sender> getCommand() {
             return Command.this;
+        }
+
+        public List<Object> getArguments() {
+            return arguments;
         }
 
     }

@@ -43,7 +43,9 @@ public class ArgumentContainer {
 
     public Result consume(String initial, boolean passAllArguments) {
         String input = initial;
+        final Command<?>.Context context = Command.getContext();
         final List<Object> inputs = new ArrayList<>(8);
+        if (context != null && context.arguments == null) context.arguments = inputs;
         for (Argument<?> argument : arguments) {
             final Argument.ParseResult result = argument.read(input);
             if (result == null) return null;

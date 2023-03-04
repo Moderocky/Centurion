@@ -75,4 +75,14 @@ public class CompoundArgumentTest extends Command<TestSender> {
                 return CommandResult.PASSED;
             });
     }
+
+    @Test
+    public void testClone() {
+        assert COMPOUND.description() == null;
+        final Argument<String> argument = COMPOUND.described("The description");
+        assert argument != COMPOUND;
+        assert argument.description().equals("The description");
+        assert COMPOUND.description() == null;
+    }
+
 }

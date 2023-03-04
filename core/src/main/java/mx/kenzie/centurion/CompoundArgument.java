@@ -63,6 +63,11 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
         this.lastParser = map.get(container);
     }
 
+    public Collection<ArgumentContainer> arguments() {
+        this.sort();
+        return new ArrayList<>(arguments);
+    }
+
     @Override
     public boolean matches(String input) {
         if (input.hashCode() == lastHash) return true;

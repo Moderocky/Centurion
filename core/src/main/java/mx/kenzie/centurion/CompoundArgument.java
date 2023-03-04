@@ -3,18 +3,27 @@ package mx.kenzie.centurion;
 import java.util.*;
 import java.util.function.Function;
 
-public class CompoundArgument<Type> implements Argument<Type> {
+public class CompoundArgument<Type> extends TypedArgument<Type> implements Argument<Type>, Cloneable {
 
-    protected final Map<InnerContainer, Converter<Type>> map = new HashMap<>();
-    protected final List<InnerContainer> arguments = new ArrayList<>();
-    protected final String label;
+    protected final Map<InnerContainer, Converter<Type>> map;
+    protected final List<InnerContainer> arguments;
     protected boolean sorted;
     protected int lastHash;
     protected Object[] lastInputs;
     protected Converter<Type> lastParser;
 
-    public CompoundArgument(String label) {
+    protected CompoundArgument(String label, Class<Type> type, Map<InnerContainer, Converter<Type>> map, List<InnerContainer> arguments) {
+        super(type);
         this.label = label;
+        this.map = map;
+        this.arguments = arguments;
+    }
+
+    public CompoundArgument(String label, Class<Type> type) {
+        super(type);
+        this.label = label;
+        this.map = new HashMap<>();
+        this.arguments = new ArrayList<>();
     }
 
     public CompoundArgument<Type> arg(Object arg1, Converter<Type> result) {
@@ -83,11 +92,6 @@ public class CompoundArgument<Type> implements Argument<Type> {
     }
 
     @Override
-    public String label() {
-        return label;
-    }
-
-    @Override
     public ParseResult read(String input) {
         this.sort();
         for (InnerContainer container : arguments) {
@@ -102,7 +106,7 @@ public class CompoundArgument<Type> implements Argument<Type> {
 
     @Override
     public int weight() {
-        return Argument.super.weight() - 2;
+        return super.weight() - 2;
     }
 
     @Override
@@ -110,6 +114,11 @@ public class CompoundArgument<Type> implements Argument<Type> {
         final List<String> list = new ArrayList<>(32);
         for (InnerContainer argument : arguments) list.addAll(argument.possibilities());
         return list.toArray(new String[0]);
+    }
+
+    @Override
+    public final CompoundArgument<Type> clone() {
+        return new CompoundArgument<>(label, type, map, arguments);
     }
 
     @FunctionalInterface

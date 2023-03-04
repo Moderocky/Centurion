@@ -11,7 +11,7 @@ import static mx.kenzie.centurion.Arguments.STRING;
 
 public class CompoundArgumentTest extends Command<TestSender> {
 
-    private static final CompoundArgument<String> COMPOUND = new CompoundArgument<String>("bean")
+    private static final CompoundArgument<String> COMPOUND = new CompoundArgument<>("bean", String.class)
         .arg("hello", "there", arguments -> "general kenobi")
         .arg(INTEGER, "there", arguments -> arguments.get(0) + " kenobi");
 

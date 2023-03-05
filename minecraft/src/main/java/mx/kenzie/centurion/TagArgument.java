@@ -248,6 +248,7 @@ public class TagArgument<Type extends Keyed> extends HashedArg<Tag<Type>> {
 
     @Override
     public boolean matches(String input) {
+        if (input.charAt(0) != '#') return false;
         this.lastHash = input.hashCode();
         this.lastValue = null;
         return this.parseNew(input) != null;

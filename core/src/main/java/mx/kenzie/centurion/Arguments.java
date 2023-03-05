@@ -57,9 +57,7 @@ public class Arguments implements Iterable<Object> {
 
     @SuppressWarnings("unchecked")
     public <Type> Type get(Class<Type> type) {
-        for (Object value : values) {
-            if (type.isInstance(value)) return (Type) value;
-        }
+        for (Object value : values) if (type.isInstance(value)) return (Type) value;
         return null;
     }
 
@@ -67,17 +65,14 @@ public class Arguments implements Iterable<Object> {
     public <Type> Type get(Class<Type> type, int index) {
         for (Object value : values) {
             if (!type.isInstance(value)) continue;
-            if (index-- < 1) return (Type) value;
+            if (--index < 0) return (Type) value;
         }
         return null;
     }
 
     @SuppressWarnings("unchecked")
-    public <Type> Type get(TypedArgument<Type> type) {
-        for (Object value : values) {
-            if (type.type.isInstance(value)) return (Type) value;
-        }
-        return null;
+    public <Type> Type get(Argument<Type> type) {
+        return (Type) map.get(type);
     }
 
     @NotNull

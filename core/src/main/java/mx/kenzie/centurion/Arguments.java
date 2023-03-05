@@ -39,7 +39,14 @@ public class Arguments implements Iterable<Object> {
 
     Arguments(Object... values) {
         this.values = Arrays.asList(values);
-        this.map = new HashMap<>(); // todo
+        this.map = new HashMap<>();
+    }
+
+    Arguments(ArgumentContainer container, Object... values) {
+        this.values = Arrays.asList(values);
+        this.map = new HashMap<>();
+        final int max = Math.min(values.length, container.arguments.length);
+        for (int i = 0; i < max; i++) map.put(container.arguments[i], values[i]);
     }
 
     @SuppressWarnings("unchecked")

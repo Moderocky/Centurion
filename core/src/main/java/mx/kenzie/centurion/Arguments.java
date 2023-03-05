@@ -2,10 +2,7 @@ package mx.kenzie.centurion;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Arguments implements Iterable<Object> {
@@ -38,9 +35,11 @@ public class Arguments implements Iterable<Object> {
     public static final TypedArgument<Argument> ARGUMENT = new ArgumentArgument();
 
     private final List<Object> values;
+    private final Map<Argument<?>, Object> map;
 
     Arguments(Object... values) {
         this.values = Arrays.asList(values);
+        this.map = new HashMap<>(); // todo
     }
 
     @SuppressWarnings("unchecked")

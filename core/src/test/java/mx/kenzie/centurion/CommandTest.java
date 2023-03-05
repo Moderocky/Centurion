@@ -132,7 +132,7 @@ public class CommandTest extends Command<TestSender> {
         final String input = "test blob 1 true 2.0";
         final TestSender sender = new TestSender();
         final Result result = this.execute(sender, input);
-        assert result.successful();
+        assert result.successful() : result.error().getMessage();
         assert Objects.equals("lot 1 2.0", sender.output) : sender.output;
     }
 
@@ -201,11 +201,11 @@ public class CommandTest extends Command<TestSender> {
                 return CommandResult.PASSED;
             })
             .arg("blob", OPTIONAL_INTEGER, OPTIONAL_BOOLEAN, (sender, arguments) -> {
-                assert !arguments.isEmpty();
-                assert arguments.get(0) == null;
-                assert arguments.get(INTEGER) == null;
-                assert arguments.get(1) instanceof Boolean;
-                assert !arguments.get(BOOLEAN);
+                assert !arguments.isEmpty() : arguments;
+                assert arguments.get(0) == null : arguments.get(0);
+                assert arguments.get(OPTIONAL_INTEGER) == null : arguments.get(OPTIONAL_INTEGER);
+                assert arguments.get(1) instanceof Boolean : arguments.get(1);
+                assert !arguments.get(OPTIONAL_BOOLEAN) : arguments.get(OPTIONAL_BOOLEAN);
                 sender.output = "lot " + arguments.get(0) + " " + arguments.get(1);
                 return CommandResult.PASSED;
             })

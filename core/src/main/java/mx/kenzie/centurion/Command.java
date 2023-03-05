@@ -234,7 +234,7 @@ public abstract class Command<Sender> implements Described {
                     if (inputs == null) continue;
                     final Input<Sender> function = functions.get(argument);
                     assert function != null;
-                    final Result result = function.apply(sender, new Arguments(inputs));
+                    final Result result = function.apply(sender, new Arguments(argument, inputs));
                     if (result.type().endParsing) return result;
                     if (result == CommandResult.LAPSE) break;
                 }

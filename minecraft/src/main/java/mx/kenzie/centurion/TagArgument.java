@@ -3,12 +3,17 @@ package mx.kenzie.centurion;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TagArgument<Type extends Keyed> extends HashedArg<Tag<Type>> {
     private static final Map<String, Tag<Material>> MATERIALS = new HashMap<>();
+    private static final Map<String, Tag<Material>> ITEMS = new HashMap<>();
+    private static final Map<String, Tag<EntityType>> ENTITIES = new HashMap<>();
 
     static {
         MATERIALS.put("WOOL", Tag.WOOL);
@@ -170,30 +175,42 @@ public class TagArgument<Type extends Keyed> extends HashedArg<Tag<Type>> {
         MATERIALS.put("SNOW_LAYER_CAN_SURVIVE_ON", Tag.SNOW_LAYER_CAN_SURVIVE_ON);
         MATERIALS.put("INVALID_SPAWN_INSIDE", Tag.INVALID_SPAWN_INSIDE);
         // items
-        MATERIALS.put("ITEMS_PIGLIN_LOVED", Tag.ITEMS_PIGLIN_LOVED);
-        MATERIALS.put("IGNORED_BY_PIGLIN_BABIES", Tag.IGNORED_BY_PIGLIN_BABIES);
-        MATERIALS.put("PIGLIN_FOOD", Tag.PIGLIN_FOOD);
-        MATERIALS.put("FOX_FOOD", Tag.FOX_FOOD);
-        MATERIALS.put("ITEMS_BANNERS", Tag.ITEMS_BANNERS);
-        MATERIALS.put("ITEMS_BOATS", Tag.ITEMS_BOATS);
-        MATERIALS.put("ITEMS_CHEST_BOATS", Tag.ITEMS_CHEST_BOATS);
-        MATERIALS.put("ITEMS_NON_FLAMMABLE_WOOD", Tag.ITEMS_NON_FLAMMABLE_WOOD);
-        MATERIALS.put("ITEMS_FISHES", Tag.ITEMS_FISHES);
-        MATERIALS.put("ITEMS_MUSIC_DISCS", Tag.ITEMS_MUSIC_DISCS);
-        MATERIALS.put("ITEMS_CREEPER_DROP_MUSIC_DISCS", Tag.ITEMS_CREEPER_DROP_MUSIC_DISCS);
-        MATERIALS.put("ITEMS_COALS", Tag.ITEMS_COALS);
-        MATERIALS.put("ITEMS_ARROWS", Tag.ITEMS_ARROWS);
-        MATERIALS.put("ITEMS_LECTERN_BOOKS", Tag.ITEMS_LECTERN_BOOKS);
-        MATERIALS.put("ITEMS_BOOKSHELF_BOOKS", Tag.ITEMS_BOOKSHELF_BOOKS);
-        MATERIALS.put("ITEMS_BEACON_PAYMENT_ITEMS", Tag.ITEMS_BEACON_PAYMENT_ITEMS);
-        MATERIALS.put("ITEMS_STONE_TOOL_MATERIALS", Tag.ITEMS_STONE_TOOL_MATERIALS);
-        MATERIALS.put("ITEMS_FURNACE_MATERIALS", Tag.ITEMS_FURNACE_MATERIALS);
-        MATERIALS.put("ITEMS_COMPASSES", Tag.ITEMS_COMPASSES);
-        MATERIALS.put("ITEMS_HANGING_SIGNS", Tag.ITEMS_HANGING_SIGNS);
-        MATERIALS.put("ITEMS_CREEPER_IGNITERS", Tag.ITEMS_CREEPER_IGNITERS);
-        MATERIALS.put("FREEZE_IMMUNE_WEARABLES", Tag.FREEZE_IMMUNE_WEARABLES);
-        MATERIALS.put("AXOLOTL_TEMPT_ITEMS", Tag.AXOLOTL_TEMPT_ITEMS);
-        MATERIALS.put("CLUSTER_MAX_HARVESTABLES", Tag.CLUSTER_MAX_HARVESTABLES);
+        ITEMS.put("PIGLIN_LOVED", Tag.ITEMS_PIGLIN_LOVED);
+        ITEMS.put("IGNORED_BY_PIGLIN_BABIES", Tag.IGNORED_BY_PIGLIN_BABIES);
+        ITEMS.put("PIGLIN_FOOD", Tag.PIGLIN_FOOD);
+        ITEMS.put("FOX_FOOD", Tag.FOX_FOOD);
+        ITEMS.put("BANNERS", Tag.ITEMS_BANNERS);
+        ITEMS.put("BOATS", Tag.ITEMS_BOATS);
+        ITEMS.put("CHEST_BOATS", Tag.ITEMS_CHEST_BOATS);
+        ITEMS.put("NON_FLAMMABLE_WOOD", Tag.ITEMS_NON_FLAMMABLE_WOOD);
+        ITEMS.put("FISHES", Tag.ITEMS_FISHES);
+        ITEMS.put("MUSIC_DISCS", Tag.ITEMS_MUSIC_DISCS);
+        ITEMS.put("CREEPER_DROP_MUSIC_DISCS", Tag.ITEMS_CREEPER_DROP_MUSIC_DISCS);
+        ITEMS.put("COALS", Tag.ITEMS_COALS);
+        ITEMS.put("ARROWS", Tag.ITEMS_ARROWS);
+        ITEMS.put("LECTERN_BOOKS", Tag.ITEMS_LECTERN_BOOKS);
+        ITEMS.put("BOOKSHELF_BOOKS", Tag.ITEMS_BOOKSHELF_BOOKS);
+        ITEMS.put("BEACON_PAYMENT_ITEMS", Tag.ITEMS_BEACON_PAYMENT_ITEMS);
+        ITEMS.put("STONE_TOOL_MATERIALS", Tag.ITEMS_STONE_TOOL_MATERIALS);
+        ITEMS.put("FURNACE_MATERIALS", Tag.ITEMS_FURNACE_MATERIALS);
+        ITEMS.put("COMPASSES", Tag.ITEMS_COMPASSES);
+        ITEMS.put("HANGING_SIGNS", Tag.ITEMS_HANGING_SIGNS);
+        ITEMS.put("CREEPER_IGNITERS", Tag.ITEMS_CREEPER_IGNITERS);
+        ITEMS.put("FREEZE_IMMUNE_WEARABLES", Tag.FREEZE_IMMUNE_WEARABLES);
+        ITEMS.put("AXOLOTL_TEMPT_ITEMS", Tag.AXOLOTL_TEMPT_ITEMS);
+        ITEMS.put("CLUSTER_MAX_HARVESTABLES", Tag.CLUSTER_MAX_HARVESTABLES);
+        // entities
+        ENTITIES.put("SKELETONS", Tag.ENTITY_TYPES_SKELETONS);
+        ENTITIES.put("RAIDERS", Tag.ENTITY_TYPES_RAIDERS);
+        ENTITIES.put("BEEHIVE_INHABITORS", Tag.ENTITY_TYPES_BEEHIVE_INHABITORS);
+        ENTITIES.put("ARROWS", Tag.ENTITY_TYPES_ARROWS);
+        ENTITIES.put("IMPACT_PROJECTILES", Tag.ENTITY_TYPES_IMPACT_PROJECTILES);
+        ENTITIES.put("POWDER_SNOW_WALKABLE_MOBS", Tag.ENTITY_TYPES_POWDER_SNOW_WALKABLE_MOBS);
+        ENTITIES.put("AXOLOTL_ALWAYS_HOSTILES", Tag.ENTITY_TYPES_AXOLOTL_ALWAYS_HOSTILES);
+        ENTITIES.put("AXOLOTL_HUNT_TARGETS", Tag.ENTITY_TYPES_AXOLOTL_HUNT_TARGETS);
+        ENTITIES.put("FREEZE_IMMUNE_ENTITY_TYPES", Tag.ENTITY_TYPES_FREEZE_IMMUNE_ENTITY_TYPES);
+        ENTITIES.put("FREEZE_HURTS_EXTRA_TYPES", Tag.ENTITY_TYPES_FREEZE_HURTS_EXTRA_TYPES);
+        ENTITIES.put("FROG_FOOD", Tag.ENTITY_TYPES_FROG_FOOD);
     }
 
     protected final Map<String, Tag<Type>> map;
@@ -208,14 +225,25 @@ public class TagArgument<Type extends Keyed> extends HashedArg<Tag<Type>> {
         return new TagArgument<>(Material.class, MATERIALS);
     }
 
+    public static TagArgument<Material> items() {
+        return new TagArgument<>(Material.class, ITEMS);
+    }
+
+    public static TagArgument<EntityType> entities() {
+        return new TagArgument<>(EntityType.class, ENTITIES);
+    }
+
     @Override
     public Tag<Type> parseNew(String input) {
-        return lastValue = map.get(input);
+        return lastValue = map.get(input.substring(1).toUpperCase());
     }
 
     @Override
     public String[] possibilities() {
-        return map.keySet().toArray(new String[0]);
+        if (possibilities != null && possibilities.length > 0) return possibilities;
+        final List<String> list = new ArrayList<>(map.size());
+        for (String key : map.keySet()) list.add("#" + key.toLowerCase());
+        return possibilities = list.toArray(new String[0]);
     }
 
     @Override

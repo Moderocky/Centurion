@@ -45,8 +45,18 @@ public class Arguments implements Iterable<Object> {
     Arguments(ArgumentContainer container, Object... values) {
         this.values = Arrays.asList(values);
         this.map = new HashMap<>();
-        final int max = Math.min(values.length, container.arguments.length);
-        for (int i = 0; i < max; i++) map.put(container.arguments[i], values[i]);
+        final Command<?>.Context context = Command.getContext();
+        if (context == null || context.getCommand() == null) this.unwrapArguments(container, false);
+        else this.unwrapArguments(container, context.getCommand().behaviour.passAllArguments);
+    }
+
+    private void unwrapArguments(ArgumentContainer container, boolean passAllArguments) {
+        final Iterator<Object> iterator = values.iterator();
+        for (Argument<?> argument : container.arguments) {
+            if (!passAllArguments && argument.literal()) continue;
+            if (!iterator.hasNext()) break;
+            this.map.put(argument, iterator.next());
+        }
     }
 
     @SuppressWarnings("unchecked")

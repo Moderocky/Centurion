@@ -10,6 +10,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     protected boolean sorted;
     protected int lastHash;
     protected Object[] lastInputs;
+    protected InnerContainer lastContainer;
     protected Converter<Type> lastParser;
 
     protected CompoundArgument(String label, Class<Type> type, Map<InnerContainer, Converter<Type>> map, List<InnerContainer> arguments) {
@@ -60,6 +61,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     private void storeResult(InnerContainer.Result result, InnerContainer container) {
         this.lastHash = result.part().hashCode();
         this.lastInputs = result.inputs();
+        this.lastContainer = container;
         this.lastParser = map.get(container);
     }
 
@@ -84,14 +86,14 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
 
     @Override
     public Type parse(String input) {
-        if (input.hashCode() == lastHash) return lastParser.apply(new Arguments(lastInputs));
+        if (input.hashCode() == lastHash) return lastParser.apply(new Arguments(lastContainer, lastInputs));
         this.sort();
         for (InnerContainer container : arguments) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;
             this.storeResult(result, container);
-            return lastParser.apply(new Arguments(lastInputs));
+            return lastParser.apply(new Arguments(container, lastInputs));
         }
         return null;
     }

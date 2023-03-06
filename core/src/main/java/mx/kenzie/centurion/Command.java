@@ -229,7 +229,11 @@ public abstract class Command<Sender> implements Described {
             try {
                 input = this.prepareArguments(input);
                 if (input.isEmpty()) return lapse.apply(sender, new Arguments());
+                final String lower = input.toLowerCase();
+                loop:
                 for (ArgumentContainer argument : arguments) {
+                    for (Argument<?> literal : argument.literals)
+                        if (!lower.contains(literal.label().toLowerCase())) continue loop;
                     final Object[] inputs = argument.check(input, passAllArguments);
                     if (inputs == null) continue;
                     final Input<Sender> function = functions.get(argument);

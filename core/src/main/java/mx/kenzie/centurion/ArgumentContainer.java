@@ -6,9 +6,13 @@ import java.util.List;
 
 public class ArgumentContainer {
     protected final Argument<?>[] arguments;
+    protected final Argument<?>[] literals;
 
     protected ArgumentContainer(Argument<?>... arguments) {
         this.arguments = arguments;
+        final List<Argument<?>> list = new ArrayList<>(arguments.length);
+        for (Argument<?> argument : arguments) if (argument.literal() && !argument.optional()) list.add(argument);
+        this.literals = list.toArray(new Argument[0]);
     }
 
     public boolean requireEmpty() {

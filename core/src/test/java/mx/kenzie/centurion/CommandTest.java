@@ -176,8 +176,11 @@ public class CommandTest extends Command<TestSender> {
 
     @Override
     public Behaviour create() {
+        final TypedArgument<Integer> optionalInteger = INTEGER.asOptional();
+        final TypedArgument<Boolean> optionalBoolean = BOOLEAN.asOptional();
+        final TypedArgument<String> optionalString = STRING.asOptional();
         return this.command("test")
-            .arg("general", OPTIONAL_STRING, (sender, arguments) -> {
+            .arg("general", optionalString, (sender, arguments) -> {
                 assert !arguments.isEmpty();
                 sender.output = arguments.get(0);
                 return CommandResult.PASSED;
@@ -200,12 +203,12 @@ public class CommandTest extends Command<TestSender> {
                 sender.output = "int " + arguments.get(0);
                 return CommandResult.PASSED;
             })
-            .arg("blob", OPTIONAL_INTEGER, OPTIONAL_BOOLEAN, (sender, arguments) -> {
+            .arg("blob", optionalInteger, optionalBoolean, (sender, arguments) -> {
                 assert !arguments.isEmpty() : arguments;
                 assert arguments.get(0) == null : arguments.get(0);
-                assert arguments.get(OPTIONAL_INTEGER) == null : arguments.get(OPTIONAL_INTEGER);
+                assert arguments.get(optionalInteger) == null : arguments.get(optionalInteger);
                 assert arguments.get(1) instanceof Boolean : arguments.get(1);
-                assert !arguments.get(OPTIONAL_BOOLEAN) : arguments.get(OPTIONAL_BOOLEAN);
+                assert !arguments.get(optionalBoolean) : arguments.get(optionalBoolean);
                 sender.output = "lot " + arguments.get(0) + " " + arguments.get(1);
                 return CommandResult.PASSED;
             })

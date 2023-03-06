@@ -219,6 +219,7 @@ public class TagArgument<Type extends Keyed> extends HashedArg<Tag<Type>> {
     public TagArgument(Class<Type> type, Map<String, Tag<Type>> map) {
         super((Class<Tag<Type>>) (Class) Tag.class);
         this.map = map;
+        this.label = type.getSimpleName().toLowerCase() + "s";
     }
 
     public static TagArgument<Material> materials() {

@@ -31,9 +31,9 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Selector> SELECTOR = new SelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
-    public static final TypedArgument<Tag<Material>> MATERIAL_TAGS = TagArgument.materials();
-    public static final TypedArgument<Tag<Material>> ITEM_TAGS = TagArgument.items();
-    public static final TypedArgument<Tag<EntityType>> ENTITY_TAGS = TagArgument.entities();
+    public static final TypedArgument<Tag<Material>> MATERIAL_TAG = TagArgument.materials();
+    public static final TypedArgument<Tag<Material>> ITEM_TAG = TagArgument.items();
+    public static final TypedArgument<Tag<EntityType>> ENTITY_TAG = TagArgument.entities();
     public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument(),
         LOCAL_NUMBER = new LocalNumberArgument();
     public static final TypedArgument<Vector> VECTOR = new CompoundArgument<>("vector", Vector.class)

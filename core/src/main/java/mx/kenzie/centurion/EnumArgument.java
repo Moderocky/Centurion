@@ -8,8 +8,9 @@ public class EnumArgument<Type extends Enum<Type>> extends HashedArg<Type> {
     @Override
     public boolean matches(String input) {
         this.lastHash = input.hashCode();
+        this.lastValue = null;
         try {
-            return this.parseNew(input) != null;
+            return (lastValue = this.parseNew(input)) != null;
         } catch (IllegalArgumentException ex) {
             return false;
         }
@@ -17,7 +18,7 @@ public class EnumArgument<Type extends Enum<Type>> extends HashedArg<Type> {
 
     @Override
     public Type parseNew(String input) {
-        return lastValue = Enum.valueOf(type, input.trim().toUpperCase());
+        return Enum.valueOf(type, input.trim().toUpperCase());
     }
 
     @Override

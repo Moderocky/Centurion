@@ -460,18 +460,18 @@ Centurion also supports automatic typing when retrieving an argument.
 
 ```java
 class MyCommand extends Commander {
-   public Command create() {
-      return command("test")
-              .arg("hello",
-                      arg("there", sender -> {
-                         System.out.println("General Kenobi!");
-                      })
-              ).arg("hello",
-                      arg((sender, args) -> {
-                         System.out.println("Hello, " + args[0] + "!");
-                      }, new ArgString())
-              );
-   }
+    public Command create() {
+        return command("test")
+            .arg("hello",
+                arg("there", sender -> {
+                    System.out.println("General Kenobi!");
+                })
+            ).arg("hello",
+                arg((sender, args) -> {
+                    System.out.println("Hello, " + args[0] + "!");
+                }, new ArgString())
+            );
+    }
 }
 ```
 
@@ -497,16 +497,6 @@ Centurion provides support for some domains out-of-the-box. This is not built in
 separate modules that include the core.
 These modules can be used as dependencies in place of the core library.
 
-### Minecraft
-
-Commands for Minecraft's Bukkit server are available.
-These are registered in the `minecraft` module and available through `MinecraftCommand`.
-Some basic argument types for the domain are available, along with placeholder formatting support and interaction
-utilities.
-
-This support was built for a recent version of the game -- it will not support older versions, it may not support future
-versions without modification.
-
 ### Discord
 
 TBD.
@@ -516,3 +506,165 @@ TBD.
 The core of Centurion is available under MIT as seen in the repository.
 
 Some classes in the 'Minecraft' submodule depend transitively on Bukkit and so are covered by GPL-3 instead.
+
+# Minecraft
+
+Commands for Minecraft's Bukkit server are available.
+These are registered in the `minecraft` module and available through `MinecraftCommand`.
+Some basic argument types for the domain are available, along with placeholder formatting support and interaction
+utilities.
+
+This support was built for a recent version of the game -- it will not support older versions, it may not support future
+versions without modification.
+
+## Arguments
+
+Rudimentary support is provided for the following argument types.
+
+### Block Face
+
+The block face argument accepts identifiers from `org.bukkit.block.BlockFace`, such as cardinal directions, up, down and
+partial directions.
+
+### Material
+
+The material argument accepts identifiers from `org.bukkit.Material`, which appear to correspond to the minecraft IDs,
+without the `minecraft:` namespace.
+
+### Entity Type
+
+The entity type argument accepts identifiers from `org.bukkit.entity.EntityType`, corresponding to the minecraft entity
+IDs without their `minecraft:` namespace.
+
+### Color
+
+The color argument accepts the legacy named colours from `net.kyori.adventure.text.format.NamedTextColor`, as well as
+hash-preceded hex colour codes like `#ff0000`.
+These colour classes are provided from a third-party library included in PaperMC.
+
+### Block Data
+
+The block data argument accepts a valid identifier in the form `namespace:key[property=value]`, where the namespace and
+property sections are optional.
+This will only accept material types that are blocks, e.g. `stone` is acceptable but `stick` is not.
+This will only accept material types registered with the Minecraft server, so `my_block` will not be accepted unless a
+modification has registered it.
+
+### Player
+
+The player argument accepts the name of an online player. It may accept an unambiguous partial name.
+
+### Selector
+
+The selector argument parses an entity selector that can be used to pick out one or more entities from a given context,
+e.g. the command sender.
+
+This can also parse complex selectors (e.g. `@e[distance=..10,limit=1]`) which are evaluated from the perspective of the
+command sender where possible.
+These selectors are parsed by Minecraft's server.
+
+### World
+
+The world argument accepts a world by name.
+
+### Key
+
+The key argument accepts a resource key, such as `minecraft:stone` or `my_mod:resource/path`.
+
+### Tag
+
+Tag arguments (Material, Item, Entity) accept a set of built-in tags, which select multiple of a thing, such as
+materials or entity types.
+These can be used to provide blanket selection, e.g. `#raiders` picking out `Pillager`, `Vindicator`, `Witch`, etc.
+
+### Relative Number
+
+Relative numbers come in the potential format `~X`, where either the preceding tilde `~` or following number `0` are
+optional.
+A no-number value `~` equates to relative zero.
+
+Relative numbers do not have to be relative, e.g. `~10` is marked as relative whereas `10` is not.
+
+What the relativity of the number means depends entirely on the implementation of a command. Minecraft typically uses
+these for relativising a position.
+
+### Local Number
+
+Local numbers must be preceded by a local marker circumflex `^`.
+A no-number value `^` equates to local zero.
+
+What the locality of the number means depends entirely on the implementation of a command. Minecraft typically uses
+these for localising a position.
+
+### Vector
+
+A vector is a quantity with direction and magnitude, representing an offset from an origin, such as `10 5 -4`.
+These are typically used to indicate position coordinates, or the length, width and height of an area, but they are not
+attached to a world.
+
+The vector argument accepts either three numerical values, e.g. `3.5 0 -9`, or a length with a direction,
+e.g. `10 meters north`. Both will be evaluated to a three-value vector.
+
+The origin of the vector is left up to the implementation of a command.
+
+### Location
+
+A location is a position within a world.
+
+The location argument accepts any of the following:
+
+```
+<x> <y> <z> in <world>
+spawn of <world>
+bed of <player>
+<offset> of <entity>
+<offset> of <location>
+```
+
+Example inputs include:
+
+```
+10 64 -45 in world_nether
+spawn of world
+bed of Mackenbee
+10 meters north of @p
+5 meters east of spawn of world
+```
+
+### Offset
+
+An offset is a special relative form of the vector argument.
+It supports relative numbers as values, e.g. `~ ~10 ~5` instead of fixed coordinates.
+This relative vector can be mapped on to a position, in which case the relative `~` inputs will be added on to the new
+origin, whereas the non-relative numbers will replace the origin coordinates.
+
+The offset argument accepts:
+
+```
+<x> <y> <z>
+<number> meters <direction>
+```
+
+Example inputs include:
+
+```
+~ ~5 ~         // 5 meters above origin
+10 ~ -42       // 10, height of origin, -42
+5 meters down  // 5 meters below origin
+```
+
+### Local Offset
+
+A local offset represents a position relative to an origin's orientation, e.g. the direction an entity is looking in.
+This accepts only local `^x` numbers.
+
+```
+<left> <up> <forwards>
+```
+
+Example inputs include:
+
+```
+^ ^ ^10
+^-2 ^0 ^4
+```

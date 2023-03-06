@@ -122,7 +122,7 @@ abstract class HashedArg<Type> extends TypedArgument<Type> {
 
     @Override
     public Type parse(String input) {
-        if (lastHash == input.hashCode()) return lastValue;
+        if (lastHash == input.hashCode() && lastValue != null) return lastValue;
         return this.parseNew(input);
     }
 
@@ -164,6 +164,7 @@ class ArgLong extends HashedArg<Long> {
     @Override
     public boolean matches(String input) {
         this.lastHash = input.hashCode();
+        this.lastValue = null;
         for (char c : input.toCharArray()) if ((c < '0' || c > '9') && c != '-') return false;
         try {
             this.lastValue = Long.parseLong(input);
@@ -189,9 +190,9 @@ class ArgDouble extends HashedArg<Double> {
     @Override
     public boolean matches(String input) {
         this.lastHash = input.hashCode();
-        if (input.endsWith("D") || input.endsWith("d")) input = input.substring(0, input.length() - 1);
+        this.lastValue = null;
         try {
-            this.lastValue = Double.parseDouble(input);
+            this.lastValue = this.parseNew(input);
             return true;
         } catch (Throwable ex) {
             return false;
@@ -267,7 +268,9 @@ class ArgClass extends HashedArg<Class> {
 
     @Override
     public boolean matches(String input) {
+        if (lastHash == input.hashCode() && lastValue != null) return true;
         this.lastHash = input.hashCode();
+        this.lastValue = null;
         if (!CLASS.matcher(input).matches()) return false;
         return (lastValue = this.parseNew(input)) != null;
     }

@@ -8,17 +8,11 @@ import java.util.regex.Pattern;
 public class Arguments implements Iterable<Object> {
     public static final TypedArgument<ArgumentContainer> PATTERN = new PatternArgument();
     public static final TypedArgument<Class> CLASS = new ArgClass();
-    public static final TypedArgument<Class> OPTIONAL_CLASS = CLASS.asOptional();
     public static final TypedArgument<Integer> INTEGER = new ArgInteger();
-    public static final TypedArgument<Integer> OPTIONAL_INTEGER = INTEGER.asOptional();
     public static final TypedArgument<Long> LONG = new ArgLong();
-    public static final TypedArgument<Long> OPTIONAL_LONG = LONG.asOptional();
     public static final TypedArgument<Double> DOUBLE = new ArgDouble();
-    public static final TypedArgument<Double> OPTIONAL_DOUBLE = DOUBLE.asOptional();
     public static final TypedArgument<Boolean> BOOLEAN = new ArgBoolean();
-    public static final TypedArgument<Boolean> OPTIONAL_BOOLEAN = BOOLEAN.asOptional();
     public static final TypedArgument<String> STRING = new ArgString();
-    public static final TypedArgument<String> OPTIONAL_STRING = STRING.asOptional();
     public static final TypedArgument<String> GREEDY_STRING = new ArgString() {
 
         @Override

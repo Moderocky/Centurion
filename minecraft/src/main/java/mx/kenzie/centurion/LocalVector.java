@@ -47,6 +47,15 @@ public class LocalVector extends RelativeVector {
     }
 
     public Vector relativeTo(Vector vector, double yaw, double pitch) {
+        final Vector transformation = this.transformation(yaw, pitch);
+        return new Vector(
+            vector.getX() + transformation.getX(),
+            vector.getY() + transformation.getY(),
+            vector.getZ() + transformation.getZ()
+        );
+    }
+
+    public Vector transformation(double yaw, double pitch) {
         final double radian = 0.017453292519943295;
         final double right = radian * (yaw + 90), back = -pitch * radian, up = radian * (-pitch + 90);
         final double cosRight = Math.cos(right), sinRight = Math.sin(right);
@@ -55,9 +64,9 @@ public class LocalVector extends RelativeVector {
         final Vector surge = new Vector(cosRight * cosBack, Math.sin(back), sinRight * cosBack);
         final Vector heave = surge.clone().crossProduct(sway).multiply(-1);
         return new Vector(
-            (surge.getX() * this.getZ()) + (sway.getX() * this.getY()) + (heave.getX() * this.getX()) + vector.getX(),
-            (surge.getY() * this.getZ()) + (sway.getY() * this.getY()) + (heave.getY() * this.getX()) + vector.getY(),
-            (surge.getZ() * this.getZ()) + (sway.getZ() * this.getY()) + (heave.getZ() * this.getX()) + vector.getZ()
+            (surge.getX() * this.getZ()) + (sway.getX() * this.getY()) + (heave.getX() * this.getX()),
+            (surge.getY() * this.getZ()) + (sway.getY() * this.getY()) + (heave.getY() * this.getX()),
+            (surge.getZ() * this.getZ()) + (sway.getZ() * this.getY()) + (heave.getZ() * this.getX())
         );
     }
 

@@ -139,14 +139,26 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         final String[] possibilities = argument.possibilities();
         if (optional) builder.append(text('[', profile.pop()));
         else if (!literal) builder.append(text('<', profile.pop()));
+        if (argument instanceof CompoundArgument<?>) builder.append(text('*', profile.pop()));
         if (possibilities.length > 0) builder.append(text(label, profile.highlight()).insertion(possibilities[0]));
         else builder.append(text(label, profile.highlight()));
         if (plural) builder.append(text("...", profile.dark()));
         if (optional) builder.append(text(']', profile.pop()));
         else if (!literal) builder.append(text('>', profile.pop()));
         final Component component = builder.build();
+        if (argument instanceof CompoundArgument<?> compound) return this.print(compound, component);
         if (argument.description() == null) return component;
         return component.hoverEvent(text(argument.description()));
+    }
+
+    private Component print(CompoundArgument<?> argument, Component component) {
+        final TextComponent.Builder builder = text();
+        if (argument.description() != null) builder.append(text(argument.description()));
+        for (CompoundArgument.InnerContainer container : argument.arguments) {
+            builder.append(Component.newline());
+            builder.append(this.print(container));
+        }
+        return component.hoverEvent(builder.build());
     }
 
     @Override

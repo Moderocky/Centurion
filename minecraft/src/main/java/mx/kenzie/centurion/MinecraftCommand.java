@@ -21,6 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
 
+import static net.kyori.adventure.text.Component.text;
+
 public abstract class MinecraftCommand extends Command<CommandSender> implements TabCompleter, CommandExecutor {
     public static final EnumArgument<BlockFace> BLOCK_FACE = new EnumArgument<>(BlockFace.class);
     public static final EnumArgument<Material> MATERIAL = new EnumArgument<>(Material.class);
@@ -82,22 +84,22 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     protected Component getPermissionMessage() {
         final ColorProfile profile = this.getProfile();
         return Component.textOfChildren(
-            Component.text("!! ", profile.pop()),
+            text("!! ", profile.pop()),
             Component.translatable("commands.help.failed", profile.highlight())
         );
     }
 
     protected CommandResult printUsage(CommandSender sender, Arguments arguments) {
         final ColorProfile profile = this.getProfile();
-        final TextComponent.Builder builder = Component.text();
-        builder.append(Component.text("Usage for ", profile.dark()))
-            .append(Component.text("/" + behaviour.label, profile.highlight()))
-            .append(Component.text(":", profile.dark()));
+        final TextComponent.Builder builder = text();
+        builder.append(text("Usage for ", profile.dark()))
+            .append(text("/" + behaviour.label, profile.highlight()))
+            .append(text(":", profile.dark()));
         for (ArgumentContainer container : behaviour.arguments) {
             final Component hover;
             final ClickEvent click;
             if (container.hasInput()) {
-                hover = Component.text("Click to Suggest");
+                hover = text("Click to Suggest");
                 final StringBuilder text = new StringBuilder("/" + behaviour.label);
                 for (Argument<?> argument : container.arguments()) {
                     if (!argument.literal()) break;
@@ -105,15 +107,15 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 }
                 click = ClickEvent.suggestCommand(text.toString());
             } else {
-                hover = Component.text("Click to Run");
+                hover = text("Click to Run");
                 click = ClickEvent.runCommand("/" + behaviour.label + container);
             }
             final Component line = Component.textOfChildren(
-                Component.text("/", profile.pop()),
-                Component.text(behaviour.label, profile.light()),
+                text("/", profile.pop()),
+                text(behaviour.label, profile.light()),
                 this.print(container)
             ).hoverEvent(hover).clickEvent(click);
-            builder.append(Component.newline()).append(Component.text("  "));
+            builder.append(Component.newline()).append(text("  "));
             builder.append(line);
         }
         sender.sendMessage(builder.build());
@@ -121,7 +123,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     }
 
     protected Component print(ArgumentContainer container) {
-        final TextComponent.Builder builder = Component.text();
+        final TextComponent.Builder builder = text();
         for (Argument<?> argument : container.arguments()) {
             builder.append(Component.space());
             builder.append(this.print(argument));
@@ -131,17 +133,20 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     protected Component print(Argument<?> argument) {
         final ColorProfile profile = this.getProfile();
-        final TextComponent.Builder builder = Component.text();
+        final TextComponent.Builder builder = text();
         final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
-        if (optional) builder.append(Component.text('[', profile.pop()));
-        else if (!literal) builder.append(Component.text('<', profile.pop()));
-        builder.append(Component.text(argument.label(), profile.highlight()));
-        if (plural) builder.append(Component.text("...", profile.dark()));
-        if (optional) builder.append(Component.text(']', profile.pop()));
-        else if (!literal) builder.append(Component.text('>', profile.pop()));
+        final String label = argument.label();
+        final String[] possibilities = argument.possibilities();
+        if (optional) builder.append(text('[', profile.pop()));
+        else if (!literal) builder.append(text('<', profile.pop()));
+        if (possibilities.length > 0) builder.append(text(label, profile.highlight()).insertion(possibilities[0]));
+        else builder.append(text(label, profile.highlight()));
+        if (plural) builder.append(text("...", profile.dark()));
+        if (optional) builder.append(text(']', profile.pop()));
+        else if (!literal) builder.append(text('>', profile.pop()));
         final Component component = builder.build();
         if (argument.description() == null) return component;
-        return component.hoverEvent(Component.text(argument.description()));
+        return component.hoverEvent(text(argument.description()));
     }
 
     @Override

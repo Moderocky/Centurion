@@ -77,6 +77,7 @@ public class ArgumentContainer {
             final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
             if (optional) builder.append('[');
             else if (!literal) builder.append('<');
+            if (argument instanceof CompoundArgument<?>) builder.append('*');
             builder.append(argument.label());
             if (plural) builder.append("...");
             if (optional) builder.append(']');

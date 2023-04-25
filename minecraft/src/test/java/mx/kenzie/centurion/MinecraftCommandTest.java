@@ -108,7 +108,7 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Test
-    public void recusiveArgument() {
+    public void recursiveArgument() {
         final TestCommandSender sender = new TestCommandSender();
         final Result result = this.execute(sender, "test 1 2 3 foo");
         assert result.successful() : result;

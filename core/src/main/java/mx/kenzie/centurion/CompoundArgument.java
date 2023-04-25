@@ -165,6 +165,10 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
             }
         }
 
+        @Override
+        public boolean requireEmpty() {
+            return false;
+        }
     }
 
 }

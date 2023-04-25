@@ -108,8 +108,17 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Test
+    public void recusiveArgument() {
+        final TestCommandSender sender = new TestCommandSender();
+        final Result result = this.execute(sender, "test 1 2 3 foo");
+        assert result.successful() : result;
+        assert result.error() == null : result.error().getMessage();
+        assert Objects.equals(sender.raw, null) : sender.output;
+    }
+
+    @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test vector <*vector>, test offset <*offset>, test local <*local>, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -142,6 +151,10 @@ public class MinecraftCommandTest extends MinecraftCommand {
             .arg("material", "gravity", MATERIAL, (sender, arguments) -> {
                 sender.sendMessage(String.valueOf(arguments.<Material>get(0).hasGravity()));
                 return PASSED;
+            })
+            .arg(VECTOR, "foo", (thing, arguments) -> {
+                final Vector vector = arguments.get(0);
+                return CommandResult.PASSED;
             });
     }
 

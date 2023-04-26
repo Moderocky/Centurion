@@ -24,6 +24,7 @@ class PlayerArgument extends TypedArgument<Player> {
     @Override
     public String[] possibilities() {
         if (possibilities.length > 0) return possibilities;
+        if (Bukkit.getServer() == null) return new String[0];
         final List<String> list = new ArrayList<>();
         for (Player player : Bukkit.getOnlinePlayers()) list.add(player.getName());
         return list.toArray(new String[0]);

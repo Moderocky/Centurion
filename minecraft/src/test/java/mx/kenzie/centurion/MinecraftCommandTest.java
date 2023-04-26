@@ -118,7 +118,7 @@ public class MinecraftCommandTest extends MinecraftCommand {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals("[test, test <*location>, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -152,10 +152,8 @@ public class MinecraftCommandTest extends MinecraftCommand {
                 sender.sendMessage(String.valueOf(arguments.<Material>get(0).hasGravity()));
                 return PASSED;
             })
-            .arg(VECTOR, "foo", (thing, arguments) -> {
-                final Vector vector = arguments.get(0);
-                return CommandResult.PASSED;
-            });
+            .arg(VECTOR, "foo", (thing, arguments) -> CommandResult.PASSED)
+            .arg(LOCATION, (sender, arguments) -> CommandResult.PASSED);
     }
 
 }

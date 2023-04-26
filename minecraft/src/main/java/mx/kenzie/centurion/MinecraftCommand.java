@@ -113,7 +113,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             final Component line = Component.textOfChildren(
                 text("/", profile.pop()),
                 text(behaviour.label, profile.light()),
-                this.print(container)
+                this.print(container, 0)
             ).hoverEvent(hover).clickEvent(click);
             builder.append(Component.newline()).append(text("  "));
             builder.append(line);
@@ -122,16 +122,16 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         return CommandResult.LAPSED;
     }
 
-    protected Component print(ArgumentContainer container) {
+    protected Component print(ArgumentContainer container, int step) {
         final TextComponent.Builder builder = text();
         for (Argument<?> argument : container.arguments()) {
             builder.append(Component.space());
-            builder.append(this.print(argument));
+            builder.append(this.print(argument, step));
         }
         return builder.build();
     }
 
-    protected Component print(Argument<?> argument) {
+    protected Component print(Argument<?> argument, int step) {
         final ColorProfile profile = this.getProfile();
         final TextComponent.Builder builder = text();
         final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
@@ -146,17 +146,17 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         if (optional) builder.append(text(']', profile.pop()));
         else if (!literal) builder.append(text('>', profile.pop()));
         final Component component = builder.build();
-        if (argument instanceof CompoundArgument<?> compound) return this.print(compound, component);
+        if (argument instanceof CompoundArgument<?> compound && step < 2) return this.print(compound, component, step);
         if (argument.description() == null) return component;
         return component.hoverEvent(text(argument.description()));
     }
 
-    private Component print(CompoundArgument<?> argument, Component component) {
+    private Component print(CompoundArgument<?> argument, Component component, int step) {
         final TextComponent.Builder builder = text();
         if (argument.description() != null) builder.append(text(argument.description()));
         for (CompoundArgument.InnerContainer container : argument.arguments) {
             builder.append(Component.newline());
-            builder.append(this.print(container));
+            builder.append(this.print(container, step + 1));
         }
         return component.hoverEvent(builder.build());
     }

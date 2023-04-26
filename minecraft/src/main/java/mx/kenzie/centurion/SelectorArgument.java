@@ -39,7 +39,7 @@ class SelectorArgument extends HashedArg<Selector> {
         list.add("@a");
         list.add("@e");
         list.add("@r");
-        for (Player player : Bukkit.getOnlinePlayers()) list.add(player.getName());
+        if (Bukkit.getServer() != null) for (Player player : Bukkit.getOnlinePlayers()) list.add(player.getName());
         return list.toArray(new String[0]);
     }
 

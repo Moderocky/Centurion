@@ -110,6 +110,7 @@ public abstract class Command<Sender> implements Described {
         protected boolean sorted;
         protected String[] patterns;
         protected boolean passAllArguments;
+        protected ArgumentContainer previous;
 
         protected Behaviour(String label, String... aliases) {
             this.label = label.toLowerCase();
@@ -177,7 +178,7 @@ public abstract class Command<Sender> implements Described {
 
         public Behaviour arg(Collection<Object> arguments, Input<Sender> function) {
             final List<Argument<?>> list = coerce(arguments);
-            final ArgumentContainer container = new ArgumentContainer(list.toArray(new Argument[0]));
+            final ArgumentContainer container = previous = new ArgumentContainer(list.toArray(new Argument[0]));
             this.arguments.add(container);
             this.functions.put(container, function);
             this.sorted = false;
@@ -238,6 +239,7 @@ public abstract class Command<Sender> implements Described {
                     if (inputs == null) continue;
                     final Input<Sender> function = functions.get(argument);
                     assert function != null;
+                    if (!this.canExecute(sender, argument)) continue;
                     final Result result = function.apply(sender, new Arguments(argument, inputs));
                     if (result.type().endParsing) return result;
                     if (result == CommandResult.LAPSE) break;
@@ -247,6 +249,11 @@ public abstract class Command<Sender> implements Described {
                 Command.setContext(null);
             }
         }
+
+        protected boolean canExecute(Sender sender, ArgumentContainer container) {
+            return true;
+        }
+
     }
 
     public class Context {

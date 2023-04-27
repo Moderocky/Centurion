@@ -96,6 +96,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             .append(text("/" + behaviour.label, profile.highlight()))
             .append(text(":", profile.dark()));
         for (ArgumentContainer container : behaviour.arguments) {
+            if (!behaviour.canExecute(sender, container)) continue;
             final Component hover;
             final ClickEvent click;
             if (container.hasInput()) {
@@ -190,6 +191,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             arguments:
             while (each.hasNext()) {
                 final ArgumentContainer next = each.next();
+                if (!behaviour.canExecute(sender, next)) continue;
                 final Argument<?>[] arguments = next.arguments();
                 if (arguments.length <= complete.length) continue;
                 int i = 0;
@@ -259,6 +261,65 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
      */
     protected ColorProfile getProfile() {
         return DEFAULT_PROFILE;
+    }
+
+    @Override
+    protected Command<CommandSender>.Behaviour command(String label, String... aliases) {
+        return new MinecraftBehaviour(label, aliases);
+    }
+
+    protected class MinecraftBehaviour extends Behaviour {
+
+        protected Map<ArgumentContainer, String> permissions = new LinkedHashMap<>();
+
+        protected MinecraftBehaviour(String label, String... aliases) {
+            super(label, aliases);
+        }
+
+        @Override
+        public MinecraftBehaviour arg(Object arg1, Input<CommandSender> function) {
+            return (MinecraftBehaviour) super.arg(arg1, function);
+        }
+
+        @Override
+        public MinecraftBehaviour arg(Object arg1, Object arg2, Input<CommandSender> function) {
+            return (MinecraftBehaviour) super.arg(arg1, arg2, function);
+        }
+
+        @Override
+        public MinecraftBehaviour arg(Object arg1, Object arg2, Object arg3, Input<CommandSender> function) {
+            return (MinecraftBehaviour) super.arg(arg1, arg2, arg3, function);
+        }
+
+        @Override
+        public MinecraftBehaviour arg(Object arg1, Object arg2, Object arg3, Object arg4, Input<CommandSender> function) {
+            return (MinecraftBehaviour) super.arg(arg1, arg2, arg3, arg4, function);
+        }
+
+        @Override
+        public MinecraftBehaviour arg(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Input<CommandSender> function) {
+            return (MinecraftBehaviour) super.arg(arg1, arg2, arg3, arg4, arg5, function);
+        }
+
+        @Override
+        public MinecraftBehaviour arg(Collection<Object> arguments, Input<CommandSender> function) {
+            return (MinecraftBehaviour) super.arg(arguments, function);
+        }
+
+        public MinecraftBehaviour permission(String permission) {
+            if (previous == null) MinecraftCommand.this.permission = permission;
+            else this.permissions.put(previous, permission);
+            return this;
+        }
+
+        @Override
+        protected boolean canExecute(CommandSender sender, ArgumentContainer container) {
+            if (permissions.isEmpty()) return true;
+            final String permission = permissions.get(container);
+            if (permission == null) return true;
+            return sender.hasPermission(permission);
+        }
+
     }
 
 }

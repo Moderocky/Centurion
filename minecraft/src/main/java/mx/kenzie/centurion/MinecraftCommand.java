@@ -264,7 +264,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     }
 
     @Override
-    protected Command<CommandSender>.Behaviour command(String label, String... aliases) {
+    protected MinecraftBehaviour command(String label, String... aliases) {
         return new MinecraftBehaviour(label, aliases);
     }
 

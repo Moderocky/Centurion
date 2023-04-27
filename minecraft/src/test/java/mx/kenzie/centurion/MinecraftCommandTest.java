@@ -117,6 +117,16 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Test
+    public void recursiveUsage() {
+        final TestCommandSender sender = new TestCommandSender();
+        try {
+            this.printUsage(sender, new Arguments());
+        } catch (StackOverflowError overflow) {
+            assert false : overflow.getMessage();
+        }
+    }
+
+    @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns()).equals("[test, test <*location>, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
     }

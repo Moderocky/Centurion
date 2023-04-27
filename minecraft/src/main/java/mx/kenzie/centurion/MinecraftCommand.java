@@ -268,6 +268,10 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         return new MinecraftBehaviour(label, aliases);
     }
 
+    public MinecraftBehaviour behaviour() {
+        return (MinecraftBehaviour) behaviour;
+    }
+
     protected class MinecraftBehaviour extends Behaviour {
 
         protected Map<ArgumentContainer, String> permissions = new LinkedHashMap<>();
@@ -313,7 +317,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         }
 
         @Override
-        protected boolean canExecute(CommandSender sender, ArgumentContainer container) {
+        public boolean canExecute(CommandSender sender, ArgumentContainer container) {
             if (permissions.isEmpty()) return true;
             final String permission = permissions.get(container);
             if (permission == null) return true;

@@ -59,7 +59,7 @@ public class ArgumentContainer {
                 inputs.add(argument.lapse());
                 continue;
             }
-            if (!argument.matches(part)) return null;
+            if (part.isEmpty() || !argument.matches(part)) return null;
             if (!passAllArguments && argument.literal()) continue;
             inputs.add(argument.parse(part));
         }

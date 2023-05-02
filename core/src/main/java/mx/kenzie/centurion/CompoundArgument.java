@@ -74,7 +74,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     public boolean matches(String input) {
         if (input.hashCode() == lastHash) return true;
         this.sort();
-        for (InnerContainer container : arguments) {
+        for (InnerContainer container : arguments.toArray(new InnerContainer[0])) {
             final InnerContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;
@@ -88,7 +88,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     public Type parse(String input) {
         if (input.hashCode() == lastHash) return lastParser.apply(new Arguments(lastContainer, lastInputs));
         this.sort();
-        for (InnerContainer container : arguments) {
+        for (InnerContainer container : arguments.toArray(new InnerContainer[0])) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;
@@ -101,7 +101,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     @Override
     public ParseResult read(String input) {
         this.sort();
-        for (InnerContainer container : arguments) {
+        for (InnerContainer container : arguments.toArray(new InnerContainer[0])) {
             final ArgumentContainer.Result result = container.consume(input, false);
             if (result == null) continue;
             if (result.inputs() == null) continue;
@@ -119,7 +119,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     @Override
     public String[] possibilities() {
         final List<String> list = new ArrayList<>(32);
-        for (InnerContainer argument : arguments) list.addAll(argument.possibilities());
+        for (InnerContainer argument : arguments.toArray(new InnerContainer[0])) list.addAll(argument.possibilities());
         return list.toArray(new String[0]);
     }
 

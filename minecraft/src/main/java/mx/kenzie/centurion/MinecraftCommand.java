@@ -84,6 +84,9 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         this.permissionMessage = permissionMessage;
     }
 
+    @Override
+    public abstract MinecraftBehaviour create();
+
     protected Component getPermissionMessage() {
         final ColorProfile profile = this.getProfile();
         return Component.textOfChildren(
@@ -292,32 +295,42 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
         @Override
         public MinecraftBehaviour arg(Object arg1, Input<CommandSender> function) {
-            return (MinecraftBehaviour) super.arg(arg1, function);
+            return this.arg(List.of(arg1), function);
         }
 
         @Override
         public MinecraftBehaviour arg(Object arg1, Object arg2, Input<CommandSender> function) {
-            return (MinecraftBehaviour) super.arg(arg1, arg2, function);
+            return this.arg(List.of(arg1, arg2), function);
         }
 
         @Override
         public MinecraftBehaviour arg(Object arg1, Object arg2, Object arg3, Input<CommandSender> function) {
-            return (MinecraftBehaviour) super.arg(arg1, arg2, arg3, function);
+            return this.arg(List.of(arg1, arg2, arg3), function);
         }
 
         @Override
         public MinecraftBehaviour arg(Object arg1, Object arg2, Object arg3, Object arg4, Input<CommandSender> function) {
-            return (MinecraftBehaviour) super.arg(arg1, arg2, arg3, arg4, function);
+            return this.arg(List.of(arg1, arg2, arg3, arg4), function);
         }
 
         @Override
         public MinecraftBehaviour arg(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Input<CommandSender> function) {
-            return (MinecraftBehaviour) super.arg(arg1, arg2, arg3, arg4, arg5, function);
+            return this.arg(List.of(arg1, arg2, arg3, arg4, arg5), function);
         }
 
         @Override
         public MinecraftBehaviour arg(Collection<Object> arguments, Input<CommandSender> function) {
             return (MinecraftBehaviour) super.arg(arguments, function);
+        }
+
+        @Override
+        public MinecraftBehaviour passAllArguments() {
+            return (MinecraftBehaviour) super.passAllArguments();
+        }
+
+        @Override
+        public MinecraftBehaviour lapse(EmptyInput<CommandSender> function) {
+            return (MinecraftBehaviour) super.lapse(function);
         }
 
         public MinecraftBehaviour permission(String permission) {

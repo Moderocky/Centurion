@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.CommandSender;
 import org.bukkit.util.Vector;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -132,7 +131,7 @@ public class MinecraftCommandTest extends MinecraftCommand {
     }
 
     @Override
-    public Command<CommandSender>.Behaviour create() {
+    public MinecraftBehaviour create() {
         return command("test")
             .arg("vector", VECTOR, (sender, arguments) -> {
                 ((TestCommandSender) sender).raw = arguments.<Vector>get(0);

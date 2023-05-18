@@ -61,7 +61,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
     }
 
-    protected String usage, permission;
+    protected String usage;
+    protected Permission permission;
     protected Component permissionMessage;
 
     {
@@ -80,7 +81,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         super();
         this.description = description;
         this.usage = usage;
-        this.permission = permission;
+        this.permission = new Permission(permission, PermissionDefault.OP);
         this.permissionMessage = permissionMessage;
     }
 
@@ -251,13 +252,16 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 if (manager.getPermission(value.getName()) != null) continue;
                 manager.addPermission(value);
             }
+            if (permission == null) return;
+            if (manager.getPermission(permission.getName()) != null) return;
+            manager.addPermission(permission);
         }
     }
 
     private void update(org.bukkit.command.Command command) {
         command.setAliases(new ArrayList<>(behaviour.aliases));
         command.setDescription(this.description);
-        command.setPermission(this.permission);
+        command.setPermission(this.permission.getName());
         command.permissionMessage(this.permissionMessage);
         command.setUsage(this.usage);
     }
@@ -334,13 +338,13 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         }
 
         public MinecraftBehaviour permission(String permission) {
-            if (previous == null) MinecraftCommand.this.permission = permission;
+            if (previous == null) MinecraftCommand.this.permission = new Permission(permission, PermissionDefault.OP);
             else this.permissions.put(previous, new Permission(permission));
             return this;
         }
 
         public MinecraftBehaviour permission(String permission, PermissionDefault allow) {
-            if (previous == null) MinecraftCommand.this.permission = permission;
+            if (previous == null) MinecraftCommand.this.permission = new Permission(permission, allow);
             else this.permissions.put(previous, new Permission(permission, allow));
             return this;
         }

@@ -39,26 +39,15 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Tag<Material>> MATERIAL_TAG = TagArgument.materials();
     public static final TypedArgument<Tag<Material>> ITEM_TAG = TagArgument.items();
     public static final TypedArgument<Tag<EntityType>> ENTITY_TAG = TagArgument.entities();
-    public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument(),
-        LOCAL_NUMBER = new LocalNumberArgument();
-    public static final TypedArgument<Vector> VECTOR = new CompoundArgument<>("vector", Vector.class)
-        .arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
-        .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
-    public static final TypedArgument<Location> LOCATION = new CompoundArgument<>("location", Location.class)
-        .arg(VECTOR, "in", WORLD, arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
-        .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
-        .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
-    public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset", RelativeVector.class)
-        .arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"), arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)))
-        .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
-    public static final TypedArgument<LocalVector> LOCAL_OFFSET = new CompoundArgument<>("local", LocalVector.class)
-        .arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"), LOCAL_NUMBER.labelled("forwards"), arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
+    public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument(), LOCAL_NUMBER = new LocalNumberArgument();
+    public static final TypedArgument<Vector> VECTOR = new CompoundArgument<>("vector", Vector.class).arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2))).arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
+    public static final TypedArgument<Location> LOCATION = new CompoundArgument<>("location", Location.class).arg(VECTOR, "in", WORLD, arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2))).arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation()).arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
+    public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset", RelativeVector.class).arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"), arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2))).arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+    public static final TypedArgument<LocalVector> LOCAL_OFFSET = new CompoundArgument<>("local", LocalVector.class).arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"), LOCAL_NUMBER.labelled("forwards"), arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
     protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
 
     static {
-        ((CompoundArgument<Location>) LOCATION)
-            .arg(OFFSET, "of", SELECTOR, arguments -> arguments.<Selector>get(2).getEntity(Command.<CommandSender>getContext().getSender()).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+        ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR, arguments -> arguments.<Selector>get(2).getEntity(Command.<CommandSender>getContext().getSender()).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)))).arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
     }
 
     protected String usage;
@@ -90,18 +79,13 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     protected Component getPermissionMessage() {
         final ColorProfile profile = this.getProfile();
-        return Component.textOfChildren(
-            text("!! ", profile.pop()),
-            Component.translatable("commands.help.failed", profile.highlight())
-        );
+        return Component.textOfChildren(text("!! ", profile.pop()), Component.translatable("commands.help.failed", profile.highlight()));
     }
 
     protected CommandResult printUsage(CommandSender sender, Arguments arguments) {
         final ColorProfile profile = this.getProfile();
         final TextComponent.Builder builder = text();
-        builder.append(text("Usage for ", profile.dark()))
-            .append(text("/" + behaviour.label, profile.highlight()))
-            .append(text(":", profile.dark()));
+        builder.append(text("Usage for ", profile.dark())).append(text("/" + behaviour.label, profile.highlight())).append(text(":", profile.dark()));
         for (ArgumentContainer container : behaviour.arguments) {
             if (!behaviour.canExecute(sender, container)) continue;
             final Component hover;
@@ -118,11 +102,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 hover = text("Click to Run");
                 click = ClickEvent.runCommand("/" + behaviour.label + container);
             }
-            final Component line = Component.textOfChildren(
-                text("/", profile.pop()),
-                text(behaviour.label, profile.light()),
-                this.print(container, 0)
-            ).hoverEvent(hover).clickEvent(click);
+            final Component line = Component.textOfChildren(text("/", profile.pop()), text(behaviour.label, profile.light()), this.print(container, 0)).hoverEvent(hover).clickEvent(click);
             builder.append(Component.newline()).append(text("  "));
             builder.append(line);
         }
@@ -239,8 +219,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 }
                 Bukkit.getLogger().log(Level.WARNING, "A command '/" + behaviour.label + "' is already defined!");
                 Bukkit.getLogger().log(Level.WARNING, "As this cannot be replaced, the executor will be overridden.");
-                Bukkit.getLogger()
-                    .log(Level.WARNING, "To avoid this warning, please do not add MinecraftCommands to your plugin.yml.");
+                Bukkit.getLogger().log(Level.WARNING, "To avoid this warning, please do not add MinecraftCommands to your plugin.yml.");
             }
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
                  InvocationTargetException e) {
@@ -261,7 +240,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     private void update(org.bukkit.command.Command command) {
         command.setAliases(new ArrayList<>(behaviour.aliases));
         command.setDescription(this.description);
-        command.setPermission(this.permission.getName());
+        command.setPermission(permission != null ? permission.getName() : null);
         command.permissionMessage(this.permissionMessage);
         command.setUsage(this.usage);
     }

@@ -268,7 +268,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         return (MinecraftBehaviour) behaviour;
     }
 
-    protected class MinecraftBehaviour extends Behaviour {
+    public class MinecraftBehaviour extends Behaviour {
 
         protected Map<ArgumentContainer, Permission> permissions = new LinkedHashMap<>();
 

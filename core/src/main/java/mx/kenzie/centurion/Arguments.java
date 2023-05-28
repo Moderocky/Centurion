@@ -31,6 +31,10 @@ public class Arguments implements Iterable<Object> {
     private final List<Object> values;
     private final Map<Argument<?>, Object> map;
 
+    public static Arguments of(Object... values) {
+        return new Arguments(values);
+    }
+
     Arguments(Object... values) {
         this.values = Arrays.asList(values);
         this.map = new HashMap<>();

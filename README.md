@@ -24,7 +24,7 @@ It is split into domain-specific modules. These may contain particular behaviour
 <dependency>
     <groupId>mx.kenzie</groupId>
     <artifactId>centurion-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -34,7 +34,7 @@ It is split into domain-specific modules. These may contain particular behaviour
 <dependency>
     <groupId>mx.kenzie</groupId>
     <artifactId>centurion-minecraft</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -460,6 +460,7 @@ Centurion also supports automatic typing when retrieving an argument.
 
 ```java
 class MyCommand extends Commander {
+
     public Command create() {
         return command("test")
             .arg("hello",
@@ -472,6 +473,7 @@ class MyCommand extends Commander {
                 }, new ArgString())
             );
     }
+
 }
 ```
 
@@ -479,6 +481,7 @@ class MyCommand extends Commander {
 
 ```java
 class MyCommand extends Command<Sender> {
+
     public Behaviour<Sender> create() {
         return command("test")
             .arg("hello", "there", (sender, arguments) -> {
@@ -488,6 +491,7 @@ class MyCommand extends Command<Sender> {
                 System.out.println("Hello, " + arguments.get(0) + "!");
             });
     }
+
 }
 ```
 
@@ -516,6 +520,23 @@ utilities.
 
 This support was built for a recent version of the game -- it will not support older versions, it may not support future
 versions without modification.
+
+## Language
+
+For integration with translation systems, centurion aims to use translatable messages internally.
+These can be edited or filled in via a client resource pack. If no pack is present they will default to English
+messages.
+
+These are used _only_ in built-in behaviour, which can be changed, overridden or removed entirely by resources using
+this.
+
+| Lang Key                     | Default                                                         |
+|------------------------------|-----------------------------------------------------------------|
+| `centurion.tooltip.suggest`  | Click to Suggest                                                |
+| `centurion.tooltip.run`      | Click to Run                                                    |
+| `commands.help.failed`       | Unknown command or insufficient permissions (Minecraft default) |
+| `centurion.argument.<label>` | (label)                                                         |
+| `centurion.text.usage`       | Usage for `%s`:                                                 |
 
 ## Arguments
 

@@ -105,6 +105,7 @@ public abstract class Command<Sender> implements Described {
         protected final String label;
         protected final Set<String> aliases;
         protected final Map<ArgumentContainer, Input<Sender>> functions;
+        protected final Map<ArgumentContainer, String> descriptions;
         protected final List<ArgumentContainer> arguments;
         protected Input<Sender> lapse = (Input<Sender>) DEFAULT_LAPSE;
         protected boolean sorted;
@@ -117,6 +118,7 @@ public abstract class Command<Sender> implements Described {
             this.aliases = new HashSet<>(List.of(aliases));
             this.arguments = new LinkedList<>();
             this.functions = new LinkedHashMap<>();
+            this.descriptions = new LinkedHashMap<>();
         }
 
         private String prepareArguments(String input) {
@@ -143,6 +145,12 @@ public abstract class Command<Sender> implements Described {
             }
             input = input.trim();
             return input;
+        }
+
+        public Behaviour description(String description) {
+            if (previous == null) Command.this.description = description;
+            else this.descriptions.put(previous, description);
+            return this;
         }
 
         public Behaviour passAllArguments() {
@@ -208,14 +216,14 @@ public abstract class Command<Sender> implements Described {
         @Override
         public String toString() {
             return "Behaviour{" +
-                "label='" + label + '\'' +
-                ", aliases=" + aliases +
-                ", functions=" + functions +
-                ", arguments=" + arguments +
-                ", lapse=" + lapse +
-                ", sorted=" + sorted +
-                ", patterns=" + Arrays.toString(patterns) +
-                '}';
+                    "label='" + label + '\'' +
+                    ", aliases=" + aliases +
+                    ", functions=" + functions +
+                    ", arguments=" + arguments +
+                    ", lapse=" + lapse +
+                    ", sorted=" + sorted +
+                    ", patterns=" + Arrays.toString(patterns) +
+                    '}';
         }
 
         @Override

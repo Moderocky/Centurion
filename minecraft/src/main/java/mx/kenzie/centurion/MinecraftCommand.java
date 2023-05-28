@@ -25,8 +25,10 @@ import java.util.*;
 import java.util.logging.Level;
 
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 
 public abstract class MinecraftCommand extends Command<CommandSender> implements TabCompleter, CommandExecutor {
+
     public static final EnumArgument<BlockFace> BLOCK_FACE = new EnumArgument<>(BlockFace.class);
     public static final EnumArgument<Material> MATERIAL = new EnumArgument<>(Material.class);
     public static final EnumArgument<EntityType> ENTITY_TYPE = new EnumArgument<>(EntityType.class);
@@ -40,14 +42,35 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Tag<Material>> ITEM_TAG = TagArgument.items();
     public static final TypedArgument<Tag<EntityType>> ENTITY_TAG = TagArgument.entities();
     public static final TypedArgument<RelativeNumber> RELATIVE_NUMBER = new RelativeNumberArgument(), LOCAL_NUMBER = new LocalNumberArgument();
-    public static final TypedArgument<Vector> VECTOR = new CompoundArgument<>("vector", Vector.class).arg(Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"), arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2))).arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
-    public static final TypedArgument<Location> LOCATION = new CompoundArgument<>("location", Location.class).arg(VECTOR, "in", WORLD, arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2))).arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation()).arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
-    public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset", RelativeVector.class).arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"), arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2))).arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
-    public static final TypedArgument<LocalVector> LOCAL_OFFSET = new CompoundArgument<>("local", LocalVector.class).arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"), LOCAL_NUMBER.labelled("forwards"), arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
-    protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
+    public static final TypedArgument<Vector> VECTOR = new CompoundArgument<>("vector", Vector.class).arg(
+            Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"),
+            arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
+        .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"),
+            arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
+    public static final TypedArgument<Location> LOCATION = new CompoundArgument<>("location", Location.class).arg(
+            VECTOR, "in", WORLD,
+            arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
+        .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
+        .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
+    public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset",
+        RelativeVector.class).arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"),
+            RELATIVE_NUMBER.labelled("z"),
+            arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)))
+        .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(
+            arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+    public static final TypedArgument<LocalVector> LOCAL_OFFSET = new CompoundArgument<>("local",
+        LocalVector.class).arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"),
+        LOCAL_NUMBER.labelled("forwards"),
+        arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
+    protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE,
+        NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
 
     static {
-        ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR, arguments -> arguments.<Selector>get(2).getEntity(Command.<CommandSender>getContext().getSender()).getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)))).arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2).add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+        ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR,
+                arguments -> arguments.<Selector>get(2).getEntity(Command.<CommandSender>getContext().getSender())
+                    .getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
+            .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2)
+                .add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
     }
 
     protected String usage;
@@ -79,19 +102,28 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     protected Component getPermissionMessage() {
         final ColorProfile profile = this.getProfile();
-        return Component.textOfChildren(text("!! ", profile.pop()), Component.translatable("commands.help.failed", profile.highlight()));
+        return Component.textOfChildren(text("!! ", profile.pop()),
+            Component.translatable("commands.help.failed", "Unknown command or insufficient permissions.",
+                profile.highlight()));
     }
 
     protected CommandResult printUsage(CommandSender sender, Arguments arguments) {
         final ColorProfile profile = this.getProfile();
         final TextComponent.Builder builder = text();
-        builder.append(text("Usage for ", profile.dark())).append(text("/" + behaviour.label, profile.highlight())).append(text(":", profile.dark()));
+        builder.append(translatable("centurion.text.usage", "Usage for %s:", profile.dark()).args(
+            text("/" + behaviour.label, profile.highlight())));
         for (ArgumentContainer container : behaviour.arguments) {
             if (!behaviour.canExecute(sender, container)) continue;
             final Component hover;
             final ClickEvent click;
             if (container.hasInput()) {
-                hover = text("Click to Suggest");
+                final String description = behaviour.descriptions.get(container);
+                if (description != null) hover = Component.textOfChildren(
+                    text(description, profile.light()),
+                    Component.newline(),
+                    translatable("centurion.tooltip.suggest", "Click to Suggest", profile.highlight())
+                );
+                else hover = translatable("centurion.tooltip.suggest", "Click to Suggest", profile.highlight());
                 final StringBuilder text = new StringBuilder("/" + behaviour.label);
                 for (Argument<?> argument : container.arguments()) {
                     if (!argument.literal()) break;
@@ -99,10 +131,16 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 }
                 click = ClickEvent.suggestCommand(text.toString());
             } else {
-                hover = text("Click to Run");
+                if (description != null) hover = Component.textOfChildren(
+                    text(description, profile.light()),
+                    Component.newline(),
+                    translatable("centurion.tooltip.run", "Click to Run", profile.highlight())
+                );
+                else hover = translatable("centurion.tooltip.run", "Click to Run", profile.highlight());
                 click = ClickEvent.runCommand("/" + behaviour.label + container);
             }
-            final Component line = Component.textOfChildren(text("/", profile.pop()), text(behaviour.label, profile.light()), this.print(container, 0)).hoverEvent(hover).clickEvent(click);
+            final Component line = Component.textOfChildren(text("/", profile.pop()),
+                text(behaviour.label, profile.light()), this.print(container, 0)).hoverEvent(hover).clickEvent(click);
             builder.append(Component.newline()).append(text("  "));
             builder.append(line);
         }
@@ -129,7 +167,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         else if (!literal) builder.append(text('<', profile.pop()));
         if (argument instanceof CompoundArgument<?>) builder.append(text('*', profile.pop()));
         if (possibilities.length > 0) builder.append(text(label, profile.highlight()).insertion(possibilities[0]));
-        else builder.append(text(label, profile.highlight()));
+        else builder.append(translatable("centurion.argument." + label, label, profile.highlight()));
         if (plural) builder.append(text("...", profile.dark()));
         if (optional) builder.append(text(']', profile.pop()));
         else if (!literal) builder.append(text('>', profile.pop()));
@@ -202,7 +240,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     @SuppressWarnings("deprecation")
     public void register(Plugin plugin) {
         try {
-            final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class,
+                Plugin.class);
             if (!constructor.isAccessible()) constructor.setAccessible(true);
             final PluginCommand command = constructor.newInstance(behaviour.label, plugin);
             this.update(command);
@@ -219,7 +258,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 }
                 Bukkit.getLogger().log(Level.WARNING, "A command '/" + behaviour.label + "' is already defined!");
                 Bukkit.getLogger().log(Level.WARNING, "As this cannot be replaced, the executor will be overridden.");
-                Bukkit.getLogger().log(Level.WARNING, "To avoid this warning, please do not add MinecraftCommands to your plugin.yml.");
+                Bukkit.getLogger().log(Level.WARNING,
+                    "To avoid this warning, please do not add MinecraftCommands to your plugin.yml.");
             }
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
                  InvocationTargetException e) {
@@ -314,6 +354,11 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         @Override
         public MinecraftBehaviour lapse(EmptyInput<CommandSender> function) {
             return (MinecraftBehaviour) super.lapse(function);
+        }
+
+        @Override
+        public MinecraftBehaviour description(String description) {
+            return (MinecraftBehaviour) super.description(description);
         }
 
         public MinecraftBehaviour permission(String permission) {

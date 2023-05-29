@@ -6,6 +6,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.*;
@@ -52,9 +53,21 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
         .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
-    public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset",
-        RelativeVector.class).arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"),
-            RELATIVE_NUMBER.labelled("z"),
+    public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset", RelativeVector.class) {
+        @Override
+        public String[] possibilities() {
+            final Context context = MinecraftCommand.getContext();
+            if (context != null && context.sender instanceof Player player) {
+                final Block block = player.getTargetBlockExact(5);
+                if (block != null) return new String[]{
+                    "~ ~ ~",
+                    (block.getX() + " " + block.getY() + " " + block.getZ())
+                };
+            }
+            return new String[]{"~ ~ ~"};
+        }
+    }
+        .arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"),
             arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(
             arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
@@ -108,6 +121,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     }
 
     protected CommandResult printUsage(CommandSender sender, Arguments arguments) {
+        final boolean tearDown = Command.getContext() == null;
+        if (tearDown) Command.setContext(new Context(sender, ""));
         final ColorProfile profile = this.getProfile();
         final TextComponent.Builder builder = text();
         builder.append(translatable("centurion.text.usage", "Usage for %s:", profile.dark()).args(
@@ -145,10 +160,12 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             builder.append(line);
         }
         sender.sendMessage(builder.build());
+        if (tearDown) Command.setContext(null);
         return CommandResult.LAPSED;
     }
 
     protected Component print(ArgumentContainer container, int step) {
+        if (Command.getContext() != null) Command.getContext().nestCounter = 0;
         final TextComponent.Builder builder = text();
         for (Argument<?> argument : container.arguments()) {
             builder.append(Component.space());

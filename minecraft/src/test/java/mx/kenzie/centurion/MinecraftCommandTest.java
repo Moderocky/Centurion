@@ -27,7 +27,8 @@ public class MinecraftCommandTest extends MinecraftCommand {
         assert new MinecraftCommandTest().execute(null, "") != null;
         assert new MinecraftCommandTest().execute(new TestCommandSender(), "test") != null;
         assert new MinecraftCommandTest().execute(new TestCommandSender(), "test").successful();
-        assert new MinecraftCommandTest().execute(new TestCommandSender(), "test material " + Material.TUFF).successful();
+        assert new MinecraftCommandTest().execute(new TestCommandSender(), "test material " + Material.TUFF)
+            .successful();
     }
 
     @Test
@@ -127,7 +128,9 @@ public class MinecraftCommandTest extends MinecraftCommand {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test <*location>, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals(
+            "[test, test <*location>, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(
+            this.patterns());
     }
 
     @Override

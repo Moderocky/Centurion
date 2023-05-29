@@ -1,6 +1,7 @@
 package mx.kenzie.centurion;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class CompoundArgument<Type> extends TypedArgument<Type> implements Argument<Type>, Cloneable {
@@ -118,6 +119,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
 
     @Override
     public String[] possibilities() {
+        if (Command.getContext() != null && ++Command.getContext().nestCounter > 24) return new String[0];
         final List<String> list = new ArrayList<>(32);
         for (InnerContainer argument : arguments.toArray(new InnerContainer[0])) list.addAll(argument.possibilities());
         return list.toArray(new String[0]);
@@ -137,21 +139,24 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
     }
 
     protected static class InnerContainer extends ArgumentContainer {
+
         InnerContainer(Argument<?>... arguments) {
             super(arguments);
         }
 
         public List<String> possibilities() {
+            final AtomicInteger checker = new AtomicInteger(0);
             if (arguments.length == 0) return Collections.emptyList();
             if (arguments.length == 1) return List.of(arguments[0].possibilities());
             final String[] strings = arguments[0].possibilities();
             if (strings.length < 1) return Collections.emptyList();
             final List<String> possibilities = new ArrayList<>(24);
-            for (String possibility : arguments[0].possibilities()) this.scrape(possibility, 1, possibilities);
+            for (String possibility : strings) this.scrape(possibility, 1, possibilities, checker);
             return possibilities;
         }
 
-        private void scrape(String bit, int index, List<String> possibilities) {
+        private void scrape(String bit, int index, List<String> possibilities, AtomicInteger checker) {
+            if (checker.incrementAndGet() > 32) return;
             final Argument<?> argument = arguments[index++];
             final String[] strings = argument.possibilities();
             if (strings.length < 1) {
@@ -160,7 +165,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
             }
             for (String possibility : strings) {
                 final String stub = bit + ' ' + possibility;
-                if (arguments.length > index) this.scrape(stub, index, possibilities);
+                if (arguments.length > index) this.scrape(stub, index, possibilities, checker);
                 else possibilities.add(stub);
             }
         }
@@ -169,6 +174,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
         public boolean requireEmpty() {
             return false;
         }
+
     }
 
 }

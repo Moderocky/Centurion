@@ -269,6 +269,7 @@ public abstract class Command<Sender> implements Described {
         protected final Sender sender;
         protected final String rawInput;
         protected List<Object> arguments;
+        protected int nestCounter;
 
         public Context(Sender sender, String input) {
             this.sender = sender;

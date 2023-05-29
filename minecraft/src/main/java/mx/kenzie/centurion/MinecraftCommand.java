@@ -146,6 +146,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
                 }
                 click = ClickEvent.suggestCommand(text.toString());
             } else {
+                final String description = behaviour.descriptions.get(container);
                 if (description != null) hover = Component.textOfChildren(
                     text(description, profile.light()),
                     Component.newline(),

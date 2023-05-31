@@ -2,7 +2,6 @@ package mx.kenzie.centurion;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -43,13 +42,13 @@ class ResolvablePlayerArgument<Type extends OfflinePlayer> extends HashedArg<Typ
     public String[] possibilities() {
         if (possibilities.length > 0) return possibilities;
         if (Bukkit.getServer() == null) return new String[0];
-        final Set<String> set = new LinkedHashSet<>();
-        for (Player player : Bukkit.getOnlinePlayers()) set.add(player.getName());
-        for (final OfflinePlayer player : Bukkit.getOfflinePlayers()) set.add(player.getName());
-        if (set.size() > 127) {
-            final List<String> list = new ArrayList<>(set);
-            return list.subList(0, 127).toArray(new String[0]);
-        } else return set.toArray(new String[0]);
+        final Set<OfflinePlayer> set = new LinkedHashSet<>();
+        set.addAll(Bukkit.getOnlinePlayers());
+        set.addAll(Arrays.asList(Bukkit.getOfflinePlayers()));
+        final List<String> list = new ArrayList<>(Math.min(128, set.size()));
+        for (final OfflinePlayer player : set) list.add(player.getName());
+        if (list.size() > 128) return list.subList(0, 127).toArray(new String[0]);
+        else return list.toArray(new String[0]);
     }
 
 }

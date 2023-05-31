@@ -4,6 +4,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 class ColorArgument extends HashedArg<TextColor> {
+
     public ColorArgument() {
         super(TextColor.class);
     }

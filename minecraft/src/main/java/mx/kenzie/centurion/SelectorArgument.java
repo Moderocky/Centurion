@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class SelectorArgument extends HashedArg<Selector> {
+
     public SelectorArgument() {
         super(Selector.class);
     }

@@ -79,7 +79,8 @@ public class RelativeVector extends Vector {
             if (relativeZ != vector.relativeZ) return false;
         }
         if (!(obj instanceof Vector vector)) return false;
-        return Math.abs(this.x - vector.getX()) < 1.0E-6 && Math.abs(this.y - vector.getY()) < 1.0E-6 && Math.abs(this.z - vector.getZ()) < 1.0E-6;
+        return Math.abs(this.x - vector.getX()) < 1.0E-6 && Math.abs(this.y - vector.getY()) < 1.0E-6 && Math.abs(
+            this.z - vector.getZ()) < 1.0E-6;
     }
 
     @Override

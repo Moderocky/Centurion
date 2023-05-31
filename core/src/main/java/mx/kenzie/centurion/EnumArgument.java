@@ -1,6 +1,7 @@
 package mx.kenzie.centurion;
 
 public class EnumArgument<Type extends Enum<Type>> extends HashedArg<Type> {
+
     public EnumArgument(Class<Type> type) {
         super(type);
     }

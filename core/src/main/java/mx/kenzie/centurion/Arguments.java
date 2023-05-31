@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class Arguments implements Iterable<Object> {
+
     public static final TypedArgument<ArgumentContainer> PATTERN = new PatternArgument();
     public static final TypedArgument<Class> CLASS = new ArgClass();
     public static final TypedArgument<Integer> INTEGER = new ArgInteger();
@@ -31,10 +32,6 @@ public class Arguments implements Iterable<Object> {
     private final List<Object> values;
     private final Map<Argument<?>, Object> map;
 
-    public static Arguments of(Object... values) {
-        return new Arguments(values);
-    }
-
     Arguments(Object... values) {
         this.values = Arrays.asList(values);
         this.map = new HashMap<>();
@@ -46,6 +43,10 @@ public class Arguments implements Iterable<Object> {
         final Command<?>.Context context = Command.getContext();
         if (context == null || context.getCommand() == null) this.unwrapArguments(container, false);
         else this.unwrapArguments(container, context.getCommand().behaviour.passAllArguments);
+    }
+
+    public static Arguments of(Object... values) {
+        return new Arguments(values);
     }
 
     private void unwrapArguments(ArgumentContainer container, boolean passAllArguments) {
@@ -117,6 +118,7 @@ public class Arguments implements Iterable<Object> {
 }
 
 abstract class HashedArg<Type> extends TypedArgument<Type> {
+
     protected int lastHash;
     protected Type lastValue;
 
@@ -157,6 +159,7 @@ class ArgInteger extends HashedArg<Integer> {
     public Integer parseNew(String input) {
         return Integer.parseInt(input.trim());
     }
+
 }
 
 class ArgLong extends HashedArg<Long> {
@@ -182,6 +185,7 @@ class ArgLong extends HashedArg<Long> {
     public Long parseNew(String input) {
         return Long.parseLong(input.trim());
     }
+
 }
 
 class ArgDouble extends HashedArg<Double> {
@@ -209,6 +213,7 @@ class ArgDouble extends HashedArg<Double> {
             return Double.parseDouble(input.substring(0, input.length() - 1));
         return Double.parseDouble(input.trim());
     }
+
 }
 
 class ArgString extends TypedArgument<String> {
@@ -235,6 +240,7 @@ class ArgString extends TypedArgument<String> {
 }
 
 class ArgBoolean extends TypedArgument<Boolean> {
+
     public ArgBoolean() {
         super(Boolean.class);
     }
@@ -263,6 +269,7 @@ class ArgBoolean extends TypedArgument<Boolean> {
 }
 
 class ArgClass extends HashedArg<Class> {
+
     private static final Pattern PART = Pattern.compile("\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");
     private static final Pattern CLASS = Pattern.compile(PART + "(\\." + PART + ")*");
 

@@ -31,6 +31,7 @@ public interface Argument<Type> extends ArgumentFace, Described {
 }
 
 interface ArgumentFace {
+
     String label();
 
     default boolean plural() {

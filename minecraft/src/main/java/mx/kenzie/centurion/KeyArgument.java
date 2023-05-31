@@ -5,6 +5,7 @@ import org.bukkit.NamespacedKey;
 import java.util.regex.Pattern;
 
 class KeyArgument extends TypedArgument<NamespacedKey> {
+
     private static final Pattern VALID_NAMESPACE = Pattern.compile("[a-z0-9._-]+");
     private static final Pattern VALID_KEY = Pattern.compile("[a-z0-9/._-]+");
 

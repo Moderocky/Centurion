@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ArgumentContainer {
+
     protected final Argument<?>[] arguments;
     protected final Argument<?>[] literals;
 

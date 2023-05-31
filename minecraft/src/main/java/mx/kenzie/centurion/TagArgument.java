@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TagArgument<Type extends Keyed> extends HashedArg<Tag<Type>> {
+
     private static final Map<String, Tag<Material>> MATERIALS = new HashMap<>();
     private static final Map<String, Tag<Material>> ITEMS = new HashMap<>();
     private static final Map<String, Tag<EntityType>> ENTITIES = new HashMap<>();

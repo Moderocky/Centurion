@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class WorldArgument extends TypedArgument<World> {
+
     public WorldArgument() {
         super(World.class);
     }

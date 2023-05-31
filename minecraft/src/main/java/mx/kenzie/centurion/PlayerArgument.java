@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-class PlayerArgument extends TypedArgument<Player> {
+class PlayerArgument extends ResolvablePlayerArgument<Player> {
+
     public PlayerArgument() {
         super(Player.class);
     }

@@ -100,6 +100,7 @@ public abstract class Command<Sender> implements Described {
 
     @SuppressWarnings("unchecked")
     public class Behaviour {
+
         public static final Input<?> DEFAULT_LAPSE = (sender, arguments) -> CommandResult.NO_BEHAVIOUR;
 
         protected final String label;
@@ -216,14 +217,14 @@ public abstract class Command<Sender> implements Described {
         @Override
         public String toString() {
             return "Behaviour{" +
-                    "label='" + label + '\'' +
-                    ", aliases=" + aliases +
-                    ", functions=" + functions +
-                    ", arguments=" + arguments +
-                    ", lapse=" + lapse +
-                    ", sorted=" + sorted +
-                    ", patterns=" + Arrays.toString(patterns) +
-                    '}';
+                "label='" + label + '\'' +
+                ", aliases=" + aliases +
+                ", functions=" + functions +
+                ", arguments=" + arguments +
+                ", lapse=" + lapse +
+                ", sorted=" + sorted +
+                ", patterns=" + Arrays.toString(patterns) +
+                '}';
         }
 
         @Override

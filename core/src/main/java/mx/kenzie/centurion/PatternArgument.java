@@ -3,6 +3,7 @@ package mx.kenzie.centurion;
 import java.util.*;
 
 public class PatternArgument extends HashedArg<ArgumentContainer> {
+
     protected Map<String, ArgumentContainer> model;
 
     public PatternArgument() { // todo argument argument ?

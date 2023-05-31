@@ -1,6 +1,7 @@
 package mx.kenzie.centurion;
 
 public class RelativeNumber extends Number {
+
     private final Number number;
     private final boolean relative;
 

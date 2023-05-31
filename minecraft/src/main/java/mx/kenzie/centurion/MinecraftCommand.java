@@ -36,6 +36,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<TextColor> COLOR = new ColorArgument().labelled("color");
     public static final TypedArgument<BlockData> BLOCK_DATA = new BlockDataArgument();
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
+    public static final TypedArgument<OfflinePlayer> KNOWN_PLAYER = new ResolvablePlayerArgument<>(false),
+        ANY_PLAYER = new ResolvablePlayerArgument<>(true);
     public static final TypedArgument<Selector> SELECTOR = new SelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();

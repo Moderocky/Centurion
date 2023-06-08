@@ -5,16 +5,32 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Selector {
 
-    private final String selector;
-    private List<Entity> list;
-    private CommandSender sender;
+    protected final String selector;
+    protected List<Entity> list;
+    protected CommandSender sender;
 
     protected Selector(String selector) {
         this.selector = selector;
+    }
+
+    /**
+     * @return an empty dummy selector
+     */
+    public static Selector empty() {
+        return new EmptySelector();
+    }
+
+    public static Selector of(String key, List<Entity> entities) {
+        return new PreSelector(key, entities);
+    }
+
+    public static Selector of(String key, Entity... entities) {
+        return new PreSelector(key, List.of(entities));
     }
 
     protected boolean verify() {
@@ -40,6 +56,47 @@ public class Selector {
     public @NotNull List<Entity> getEntities(CommandSender sender) {
         if (sender == this.sender && list != null) return list;
         return list = Bukkit.selectEntities(this.sender = sender, selector);
+    }
+
+}
+
+class EmptySelector extends Selector {
+
+    protected EmptySelector() {
+        super("@x");
+    }
+
+    @Override
+    public @NotNull List<Entity> getEntities(CommandSender sender) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Entity getEntity(CommandSender sender) {
+        return null;
+    }
+
+    @Override
+    protected boolean verify() {
+        return true;
+    }
+
+}
+
+class PreSelector extends Selector {
+
+    protected PreSelector(String selector, List<Entity> list) {
+        super(selector);
+        this.list = list;
+    }
+
+    @Override
+    protected boolean verify() {
+        return list != null;
+    }
+
+    public @NotNull List<Entity> getEntities(CommandSender sender) {
+        return list;
     }
 
 }

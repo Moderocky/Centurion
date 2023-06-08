@@ -1,5 +1,8 @@
 package mx.kenzie.centurion;
 
+import mx.kenzie.centurion.selector.Finder;
+import mx.kenzie.centurion.selector.Selector;
+import mx.kenzie.centurion.selector.Universe;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -8,28 +11,29 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
-public class Selector {
+public class MinecraftSelector extends Selector<Entity> {
 
     protected final String selector;
     protected List<Entity> list;
     protected CommandSender sender;
 
-    protected Selector(String selector) {
+    protected MinecraftSelector(String selector) {
+        super(Finder.ALL_ENTITIES);
         this.selector = selector;
     }
 
     /**
      * @return an empty dummy selector
      */
-    public static Selector empty() {
+    public static MinecraftSelector empty() {
         return new EmptySelector();
     }
 
-    public static Selector of(String key, List<Entity> entities) {
+    public static MinecraftSelector of(String key, List<Entity> entities) {
         return new PreSelector(key, entities);
     }
 
-    public static Selector of(String key, Entity... entities) {
+    public static MinecraftSelector of(String key, Entity... entities) {
         return new PreSelector(key, List.of(entities));
     }
 
@@ -58,9 +62,19 @@ public class Selector {
         return list = Bukkit.selectEntities(this.sender = sender, selector);
     }
 
+    @Override
+    public Entity getOne(CommandSender sender) {
+        return this.getEntity(sender);
+    }
+
+    @Override
+    public List<Entity> getAll(CommandSender sender) {
+        return this.getEntities(sender);
+    }
+
 }
 
-class EmptySelector extends Selector {
+class EmptySelector extends MinecraftSelector {
 
     protected EmptySelector() {
         super("@x");
@@ -83,7 +97,7 @@ class EmptySelector extends Selector {
 
 }
 
-class PreSelector extends Selector {
+class PreSelector extends MinecraftSelector {
 
     protected PreSelector(String selector, List<Entity> list) {
         super(selector);

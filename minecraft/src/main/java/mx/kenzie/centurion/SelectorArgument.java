@@ -6,10 +6,10 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-class SelectorArgument extends HashedArg<Selector> {
+class SelectorArgument extends HashedArg<MinecraftSelector> {
 
     public SelectorArgument() {
-        super(Selector.class);
+        super(MinecraftSelector.class);
     }
 
     @Override
@@ -17,7 +17,7 @@ class SelectorArgument extends HashedArg<Selector> {
         this.lastHash = input.hashCode();
         this.lastValue = null;
         try {
-            final Selector selector = this.parseNew(input);
+            final MinecraftSelector selector = this.parseNew(input);
             if (!selector.verify()) return false;
             this.lastValue = selector;
             return true;
@@ -27,8 +27,8 @@ class SelectorArgument extends HashedArg<Selector> {
     }
 
     @Override
-    public Selector parseNew(String input) {
-        return new Selector(input);
+    public MinecraftSelector parseNew(String input) {
+        return new MinecraftSelector(input);
     }
 
     @Override

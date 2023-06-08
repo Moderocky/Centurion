@@ -38,7 +38,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
     public static final TypedArgument<OfflinePlayer> KNOWN_PLAYER = new ResolvablePlayerArgument<>(false),
         ANY_PLAYER = new ResolvablePlayerArgument<>(true);
-    public static final TypedArgument<Selector> SELECTOR = new SelectorArgument().labelled("entity");
+    public static final TypedArgument<MinecraftSelector> SELECTOR = new SelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
     public static final TypedArgument<Tag<Material>> MATERIAL_TAG = TagArgument.materials();
@@ -82,7 +82,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     static {
         ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR,
-                arguments -> arguments.<Selector>get(2).getEntity(Command.<CommandSender>getContext().getSender())
+                arguments -> arguments.<MinecraftSelector>get(2).getEntity(Command.<CommandSender>getContext().getSender())
                     .getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
             .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2)
                 .add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));

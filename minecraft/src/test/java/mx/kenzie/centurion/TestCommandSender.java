@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class TestCommandSender implements CommandSender {
+
     public String output;
     public Object raw;
 
@@ -121,4 +122,5 @@ public class TestCommandSender implements CommandSender {
     public void setOp(boolean value) {
 
     }
+
 }

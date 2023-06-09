@@ -8,7 +8,8 @@ public class RelativeVectorTest {
 
     @Test
     public void relativeTo() {
-        final RelativeVector vector = new RelativeVector(new RelativeNumber(1, true), new RelativeNumber(0, false), new RelativeNumber(0, true));
+        final RelativeVector vector = new RelativeVector(new RelativeNumber(1, true), new RelativeNumber(0, false),
+            new RelativeNumber(0, true));
         final Vector two = vector.relativeTo(2, 2, 2);
         assert two != null;
         assert two.getX() == 3;
@@ -34,7 +35,8 @@ public class RelativeVectorTest {
 
     @Test
     public void isRelative() {
-        final RelativeVector vector = new RelativeVector(new RelativeNumber(1, true), new RelativeNumber(0, false), new RelativeNumber(0, true));
+        final RelativeVector vector = new RelativeVector(new RelativeNumber(1, true), new RelativeNumber(0, false),
+            new RelativeNumber(0, true));
         assert vector.isRelativeX();
         assert vector.isRelativeZ();
         assert !vector.isRelativeY();

@@ -17,13 +17,6 @@ public interface Finder<Type> {
     Finder<Player> PLAYER = new PlayerFinder(), ALL_PLAYERS = new PlayersFinder();
     Finder<Entity> ALL_ENTITIES = new EntityFinder();
 
-    /**
-     * @return the simple name after the @
-     */
-    String key();
-
-    Collection<Type> find(CommandSender sender);
-
     static <Type> Finder<Type> fixed(String key, List<Type> list) {
         return new FixedFinder<>(key, list);
     }
@@ -31,6 +24,13 @@ public interface Finder<Type> {
     static <Type> Finder<Type> fixed(String key, Type... list) {
         return new FixedFinder<>(key, List.of(list));
     }
+
+    /**
+     * @return the simple name after the @
+     */
+    String key();
+
+    Collection<Type> find(CommandSender sender);
 
 }
 

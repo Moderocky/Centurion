@@ -2,7 +2,6 @@ package mx.kenzie.centurion;
 
 import mx.kenzie.centurion.selector.Finder;
 import mx.kenzie.centurion.selector.Selector;
-import mx.kenzie.centurion.selector.Universe;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;

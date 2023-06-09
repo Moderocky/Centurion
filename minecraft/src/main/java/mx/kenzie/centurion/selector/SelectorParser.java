@@ -41,7 +41,6 @@ public class SelectorParser<Type> {
                 throw new SelectorException("Wrong character expecting opening read.");
         }
         boolean read = true;
-        read:
         while (read) {
             final StringBuilder antecedent = new StringBuilder();
             do {

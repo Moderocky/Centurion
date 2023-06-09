@@ -84,10 +84,9 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     static {
         ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR,
-                arguments -> arguments.<MinecraftSelector>get(2).getEntity(Command.<CommandSender>getContext().getSender())
-                    .getLocation().add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
-            .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(2)
-                .add(arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+                arguments -> arguments.<MinecraftSelector>get(1).getEntity(Command.<CommandSender>getContext().getSender())
+                    .getLocation().add(arguments.<RelativeVector>get(0)))
+            .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(1).add(arguments.<RelativeVector>get(0)));
     }
 
     protected String usage;

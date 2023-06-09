@@ -119,7 +119,7 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
 
     @Override
     public String[] possibilities() {
-        if (Command.getContext() != null && ++Command.getContext().nestCounter > 24) return new String[0];
+        if (Command.getContext() != null && ++Command.getContext().nestCounter > 8) return new String[0];
         final List<String> list = new ArrayList<>(32);
         for (InnerContainer argument : arguments.toArray(new InnerContainer[0])) list.addAll(argument.possibilities());
         return list.toArray(new String[0]);

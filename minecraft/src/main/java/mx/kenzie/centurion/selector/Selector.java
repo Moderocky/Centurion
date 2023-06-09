@@ -17,6 +17,10 @@ public class Selector<Type> {
         this.filters = filters;
     }
 
+    public static <Type> boolean validate(String selector, Universe<Type> universe) {
+        return new SelectorParser<>(selector, universe).validate();
+    }
+
     @SuppressWarnings("unchecked")
     public static <Result, Type extends Result> Selector<Result> of(String selector, Universe<Type> universe) {
         return (Selector<Result>) new SelectorParser<>(selector, universe).parse();

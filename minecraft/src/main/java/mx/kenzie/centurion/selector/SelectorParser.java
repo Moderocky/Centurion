@@ -16,6 +16,74 @@ public class SelectorParser<Type> {
     }
 
     @SuppressWarnings("unchecked")
+    public boolean validate() {
+        final StringReader reader = new StringReader(input);
+        try {
+            if (reader.read() != '@') return false;
+            if (!this.validateFinder(reader)) return false;
+            return this.validateFilters(reader);
+        } catch (IOException exception) {
+            return false;
+        }
+    }
+
+    private boolean validateFinder(StringReader reader) throws IOException {
+        final StringBuilder builder = new StringBuilder();
+        do {
+            reader.mark(4);
+            final int c = reader.read();
+            if (c == -1) break;
+            else if (c == '[') {
+                reader.reset();
+                break;
+            }
+            builder.append((char) c);
+        } while (true);
+        final String label = builder.toString();
+        for (final Finder<? extends Type> test : universe.finders()) if (label.equals(test.key())) return true;
+        return false;
+    }
+
+    private boolean validateFilters(StringReader reader) throws IOException {
+        switch (reader.read()) {
+            case -1:
+                return true;
+            case '[':
+                break;
+            default:
+                return false;
+        }
+        read:
+        while (true) {
+            final StringBuilder antecedent = new StringBuilder();
+            do {
+                final int c = reader.read();
+                if (c == -1) return false;
+                else if (c == '=') break;
+                antecedent.append((char) c);
+            } while (true);
+            final String label = antecedent.toString();
+            if (label.isBlank()) return false;
+            final StringBuilder consequent = new StringBuilder();
+            do {
+                final int c = reader.read();
+                if (c == -1) return false;
+                else if (c == ']') return true;
+                else if (c == ',') break;
+                consequent.append((char) c);
+            } while (true);
+            final String input = consequent.toString();
+            if (input.isBlank()) return false;
+            for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
+                if (!criterion.label().equals(label)) continue;
+                if (!criterion.matches(input)) continue;
+                continue read;
+            }
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public <Result extends Type> Selector<Result> parse() throws SelectorException {
         final StringReader reader = new StringReader(input);
         try {

@@ -17,6 +17,10 @@ public class Selector<Type> {
         this.filters = filters;
     }
 
+    public static <Type> Selector<Type> of(String selector, Universe<Type> universe) {
+        return new SelectorParser<>(selector, universe).parse();
+    }
+
     public List<Type> getAll(CommandSender sender) {
         final List<Type> list = new LinkedList<>(finder.find(sender));
         for (final Filter<Type> filter : filters) list.removeIf(filter);

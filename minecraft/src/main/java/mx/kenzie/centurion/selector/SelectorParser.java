@@ -8,12 +8,10 @@ import java.util.List;
 public class SelectorParser<Type> {
 
     protected final String input;
-    protected final Class<Type> expected;
     protected final Universe<Type> universe;
 
-    public SelectorParser(String input, Class<Type> expected, Universe<Type> universe) {
+    public SelectorParser(String input, Universe<Type> universe) {
         this.input = input;
-        this.expected = expected;
         this.universe = universe;
     }
 

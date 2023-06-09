@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import static net.kyori.adventure.text.Component.text;
@@ -38,6 +39,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
     public static final TypedArgument<OfflinePlayer> KNOWN_PLAYER = new ResolvablePlayerArgument<>(false),
         ANY_PLAYER = new ResolvablePlayerArgument<>(true);
+    public static final TypedArgument<Predicate<Double>> INEQUALITY = new InequalityArgument();
     public static final TypedArgument<MinecraftSelector> SELECTOR = new SelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();

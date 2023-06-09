@@ -17,8 +17,9 @@ public class Selector<Type> {
         this.filters = filters;
     }
 
-    public static <Type> Selector<Type> of(String selector, Universe<Type> universe) {
-        return new SelectorParser<>(selector, universe).parse();
+    @SuppressWarnings("unchecked")
+    public static <Result, Type extends Result> Selector<Result> of(String selector, Universe<Type> universe) {
+        return (Selector<Result>) new SelectorParser<>(selector, universe).parse();
     }
 
     public static <Type> Selector<Type> empty() {

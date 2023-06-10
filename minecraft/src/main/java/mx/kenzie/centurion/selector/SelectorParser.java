@@ -28,18 +28,8 @@ public class SelectorParser<Type> {
     }
 
     private boolean validateFinder(StringReader reader) throws IOException {
-        final StringBuilder builder = new StringBuilder();
-        do {
-            reader.mark(4);
-            final int c = reader.read();
-            if (c == -1) break;
-            else if (c == '[') {
-                reader.reset();
-                break;
-            }
-            builder.append((char) c);
-        } while (true);
-        final String label = builder.toString();
+        final String label = readLabel(reader);
+        if (label.isBlank()) return false;
         for (final Finder<? extends Type> test : universe.finders()) if (label.equals(test.key())) return true;
         return false;
     }
@@ -127,18 +117,27 @@ public class SelectorParser<Type> {
                 } else if (c == ',') break;
                 consequent.append((char) c);
             } while (true);
-            final String input = consequent.toString();
+            final String string = consequent.toString(), input;
+            if (string.isBlank()) break;
+            final boolean invert = string.charAt(0) == '!';
+            input = invert ? string.substring(1) : string;
             if (input.isBlank()) break;
             for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
                 if (!criterion.label().equals(label)) continue;
                 if (!criterion.matches(input)) continue;
-                list.add(criterion.filter(input));
+                list.add(criterion.filter(input, invert));
             }
         }
         return list.toArray(new Filter[0]);
     }
 
     private Finder<? extends Type> readFinder(StringReader reader) throws IOException {
+        final String label = readLabel(reader);
+        for (final Finder<? extends Type> test : universe.finders()) if (label.equals(test.key())) return test;
+        throw new SelectorException("No finder was matched for " + label, true);
+    }
+
+    private String readLabel(StringReader reader) throws IOException {
         final StringBuilder builder = new StringBuilder();
         do {
             reader.mark(4);
@@ -150,9 +149,7 @@ public class SelectorParser<Type> {
             }
             builder.append((char) c);
         } while (true);
-        final String label = builder.toString();
-        for (final Finder<? extends Type> test : universe.finders()) if (label.equals(test.key())) return test;
-        throw new SelectorException("No finder was matched for " + label, true);
+        return builder.toString();
     }
 
 }

@@ -1,5 +1,8 @@
 package mx.kenzie.centurion;
 
+import mx.kenzie.centurion.selector.Criterion;
+import mx.kenzie.centurion.selector.Finder;
+import mx.kenzie.centurion.selector.Universe;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -10,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -34,6 +38,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final EnumArgument<BlockFace> BLOCK_FACE = new EnumArgument<>(BlockFace.class);
     public static final EnumArgument<Material> MATERIAL = new EnumArgument<>(Material.class);
     public static final EnumArgument<EntityType> ENTITY_TYPE = new EnumArgument<>(EntityType.class);
+    public static final EnumArgument<GameMode> GAME_MODE = new EnumArgument<>(GameMode.class);
     public static final TypedArgument<TextColor> COLOR = new ColorArgument().labelled("color");
     public static final TypedArgument<BlockData> BLOCK_DATA = new BlockDataArgument();
     public static final TypedArgument<Player> PLAYER = new PlayerArgument();
@@ -79,8 +84,11 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         LocalVector.class).arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"),
         LOCAL_NUMBER.labelled("forwards"),
         arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
-    protected static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE,
+    public static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE,
         NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
+    protected static final Universe<Entity> ENTITY_UNIVERSE = Universe.of(Finder.ALL_ENTITIES, Finder.ALL_PLAYERS,
+        Finder.PLAYER, Finder.RANDOM_PLAYER, Finder.SENDER, Criterion.ENTITY_DISTANCE, Criterion.ENTITY_TYPE,
+        Criterion.LIMIT, Criterion.GAME_MODE, Criterion.LEVEL, Criterion.X_ROTATION, Criterion.Y_ROTATION);
 
     static {
         ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR,

@@ -30,13 +30,13 @@ public class InequalityArgument extends HashedArg<Predicate<Double>> {
     public Predicate<Double> parseNew(String input) {
         if (input.startsWith("..")) {
             final double test = Double.parseDouble(input.substring(2));
-            return number -> number < test;
+            return number -> number <= test;
         } else if (input.startsWith("<")) {
             final double test = Double.parseDouble(input.substring(1));
             return number -> number < test;
         } else if (input.endsWith("..")) {
             final double test = Double.parseDouble(input.substring(0, input.length() - 2));
-            return number -> number > test;
+            return number -> number >= test;
         } else if (input.startsWith(">")) {
             final double test = Double.parseDouble(input.substring(1));
             return number -> number > test;
@@ -44,7 +44,7 @@ public class InequalityArgument extends HashedArg<Predicate<Double>> {
             final int cut = input.indexOf("..");
             final String start = input.substring(0, cut), end = input.substring(cut + 2);
             final double low = Double.parseDouble(start), high = Double.parseDouble(end);
-            return number -> number > low && number < high;
+            return number -> number >= low && number <= high;
         } else {
             final double test = Double.parseDouble(input);
             return number -> number == test;

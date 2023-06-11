@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class SelectorArgument<Type> extends HashedArg<Selector<Type>> {
+public class SelectorArgument<Type> extends HashedArg<Selector<Type>> {
 
     protected final Universe<Type> universe;
 
@@ -25,26 +25,40 @@ class SelectorArgument<Type> extends HashedArg<Selector<Type>> {
 
     @Override
     public boolean matches(String input) {
-        return Selector.validate(input, universe);
+        if (input.startsWith("@")) return Selector.validate(input, universe);
+        return this.literalArgument() != null && this.literalArgument().matches(input);
     }
 
     @Override
     public Selector<Type> parseNew(String input) {
-        return Selector.of(input, universe);
+        final Argument<? extends Type> argument = this.literalArgument();
+        if (input.startsWith("@")) return Selector.of(input, universe);
+        else if (argument != null) return Selector.fixed(argument.parse(input));
+        return Selector.empty();
+    }
+
+    /**
+     * This method is designed for selectors that accept some kind of literal naming key.
+     * Minecraft selectors accept a player's name (and potentially UUID?) as well as a @selector.
+     * In this case you could return a player argument to have that be checked.
+     */
+    protected Argument<? extends Type> literalArgument() {
+        return null;
     }
 
     @Override
     public String[] possibilities() {
-        final Set<String> list = new HashSet<>();
+        final Set<String> set = new HashSet<>();
         final Command<CommandSender>.Context context = MinecraftCommand.getContext();
+        final Argument<? extends Type> argument = this.literalArgument();
+        if (argument != null) set.addAll(List.of(argument.possibilities()));
         if (context == null || context.rawInput.isBlank()) {
-            for (final Finder<? extends Type> finder : universe.finders()) {
-                list.add("@" + finder.key());
-            }
-            return list.toArray(new String[0]);
+            for (final Finder<? extends Type> finder : universe.finders()) set.add("@" + finder.key());
+            return set.toArray(new String[0]);
         }
-        final Selector.PositionResult result = Selector.position(context.rawInput, universe);
-        return result.suggestions();
+        final Selector.PositionResult result = Selector.position(context.getRawInput(), universe);
+        set.addAll(List.of(result.suggestions()));
+        return set.toArray(new String[0]);
     }
 
 }

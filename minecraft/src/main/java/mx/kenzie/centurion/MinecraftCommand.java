@@ -48,6 +48,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<Predicate<Double>> INEQUALITY = new InequalityArgument();
     public static final TypedArgument<Selector<Entity>> SELECTOR = new MinecraftSelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
+    public static final TypedArgument<UUID> UUID = new UUIDArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
     public static final TypedArgument<Tag<Material>> MATERIAL_TAG = TagArgument.materials();
     public static final TypedArgument<Tag<Material>> ITEM_TAG = TagArgument.items();

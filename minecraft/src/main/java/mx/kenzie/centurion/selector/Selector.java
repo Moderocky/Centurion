@@ -17,6 +17,16 @@ public class Selector<Type> {
         this.filters = filters;
     }
 
+    public static <Type> PositionResult position(String input, Universe<Type> universe) {
+        if (input == null) return new PositionResult(Caret.OTHER);
+        if (input.endsWith(" ")) return new SelectorParser<>("", universe).suggest();
+        final String[] args = input.split(" ");
+        final String source = args[args.length - 1];
+        final SelectorParser<Type> parser = new SelectorParser<>(source, universe);
+        return parser.suggest();
+
+    }
+
     public static <Type> boolean validate(String selector, Universe<Type> universe) {
         return new SelectorParser<>(selector, universe).validate();
     }
@@ -55,5 +65,7 @@ public class Selector<Type> {
         }
         return null;
     }
+
+    public record PositionResult(Caret caret, String... suggestions) {}
 
 }

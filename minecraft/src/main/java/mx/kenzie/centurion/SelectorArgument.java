@@ -1,15 +1,58 @@
 package mx.kenzie.centurion;
 
+import mx.kenzie.centurion.selector.Finder;
+import mx.kenzie.centurion.selector.Selector;
+import mx.kenzie.centurion.selector.Universe;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-class SelectorArgument extends HashedArg<MinecraftSelector> {
+class SelectorArgument<Type> extends HashedArg<Selector<Type>> {
 
-    public SelectorArgument() {
-        super(MinecraftSelector.class);
+    protected final Universe<Type> universe;
+
+    @SuppressWarnings("unchecked")
+    public SelectorArgument(Universe<Type> universe) {
+        super((Class<Selector<Type>>) (Object) Selector.class);
+        this.universe = universe;
+    }
+
+    @Override
+    public boolean matches(String input) {
+        return Selector.validate(input, universe);
+    }
+
+    @Override
+    public Selector<Type> parseNew(String input) {
+        return Selector.of(input, universe);
+    }
+
+    @Override
+    public String[] possibilities() {
+        final Set<String> list = new HashSet<>();
+        final Command<CommandSender>.Context context = MinecraftCommand.getContext();
+        if (context == null || context.rawInput.isBlank()) {
+            for (final Finder<? extends Type> finder : universe.finders()) {
+                list.add("@" + finder.key());
+            }
+            return list.toArray(new String[0]);
+        }
+        final Selector.PositionResult result = Selector.position(context.rawInput, universe);
+        return result.suggestions();
+    }
+
+}
+
+class MinecraftSelectorArgument extends SelectorArgument<Entity> {
+
+    public MinecraftSelectorArgument() {
+        super(Universe.of());
     }
 
     @Override
@@ -18,10 +61,9 @@ class SelectorArgument extends HashedArg<MinecraftSelector> {
         this.lastValue = null;
         try {
             final MinecraftSelector selector = this.parseNew(input);
-            if (!selector.verify()) return false;
             this.lastValue = selector;
-            return true;
-        } catch (IllegalArgumentException ex) {
+            return selector.verify();
+        } catch (Throwable ex) {
             return false;
         }
     }

@@ -3,7 +3,9 @@ package mx.kenzie.centurion.selector;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SelectorParser<Type> {
 
@@ -13,6 +15,106 @@ public class SelectorParser<Type> {
     public SelectorParser(String input, Universe<Type> universe) {
         this.input = input;
         this.universe = universe;
+    }
+
+    protected Selector.PositionResult suggest() {
+        if (input == null) return new Selector.PositionResult(Caret.OTHER);
+        final Set<String> set = new HashSet<>();
+        final StringReader reader = new StringReader(input);
+        final StringBuilder correct = new StringBuilder();
+        try {
+            //<editor-fold desc="Suggest Finders" defaultstate="collapsed">
+            final int first = reader.read();
+            if (first != '@' && first != -1) return new Selector.PositionResult(Caret.OTHER);
+            else if (first == -1 || !this.validateFinder(reader)) {
+                for (final Finder<? extends Type> finder : universe.finders()) set.add("@" + finder.key());
+                return new Selector.PositionResult(Caret.START, set.toArray(new String[0]));
+            }
+            //</editor-fold>
+            //<editor-fold desc="Suggest Criteria" defaultstate="collapsed">
+            switch (reader.read()) {
+                case -1:
+                    return new Selector.PositionResult(Caret.AFTER_START, input + "[");
+                case '[':
+                    break;
+                default:
+                    return new Selector.PositionResult(Caret.OTHER);
+            }
+            correct.append(input, 0, input.indexOf('[') + 1);
+            Caret caret;
+            while (true) {
+                caret = Caret.IN_KEY;
+                final StringBuilder antecedent = new StringBuilder();
+                do {
+                    final int c = reader.read();
+                    if (c == -1) {
+                        //<editor-fold desc="Suggest Keys" defaultstate="collapsed">
+                        final String key = antecedent.toString();
+                        for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
+                            if (!criterion.label().startsWith(key)) continue;
+                            if (criterion.label().length() == key.length())
+                                return new Selector.PositionResult(Caret.AFTER_KEY, correct + key + '=');
+                            else {
+                                set.add(correct + criterion.label() + '=');
+                            }
+                        }
+                        return new Selector.PositionResult(Caret.IN_KEY, set.toArray(new String[0]));
+                        //</editor-fold>
+                    } else if (c == '=') break;
+                    antecedent.append((char) c);
+                } while (true);
+                final String label = antecedent.toString();
+                if (label.isBlank()) {
+                    //<editor-fold desc="Suggest Keys" defaultstate="collapsed">
+                    for (final Criterion<? extends Type, ?> criterion : universe.criteria())
+                        set.add(correct + criterion.label() + '=');
+                    return new Selector.PositionResult(Caret.IN_KEY, set.toArray(new String[0]));
+                    //</editor-fold>
+                }
+                caret = Caret.IN_VALUE;
+                correct.append(label).append('=');
+                final StringBuilder consequent = new StringBuilder();
+                do {
+                    final int c = reader.read();
+                    if (c == -1) {
+                        //<editor-fold desc="Suggest Values" defaultstate="collapsed">
+                        final String value = consequent.toString();
+                        for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
+                            if (!criterion.label().equals(label)) continue;
+                            for (final String possibility : criterion.argument().possibilities()) {
+                                if (possibility.startsWith(value)) set.add(correct + possibility);
+                            }
+                        }
+                        for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
+                            if (!criterion.label().equals(label)) continue;
+                            if (!criterion.matches(value)) continue;
+                            return new Selector.PositionResult(Caret.AFTER_VALUE, input + "]", input + ",");
+                        }
+                        return new Selector.PositionResult(Caret.IN_VALUE, set.toArray(new String[0]));
+                        //</editor-fold>
+                    } else if (c == ']') {
+                        return new Selector.PositionResult(Caret.OTHER);
+                    } else if (c == ',') break;
+                    consequent.append((char) c);
+                } while (true);
+                final String input = consequent.toString();
+                if (input.isBlank()) {
+                    //<editor-fold desc="Suggest Values" defaultstate="collapsed">
+                    for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
+                        if (!criterion.label().equals(label)) continue;
+                        for (final String possibility : criterion.argument().possibilities()) {
+                            set.add(correct + possibility);
+                        }
+                    }
+                    return new Selector.PositionResult(Caret.IN_VALUE, set.toArray(new String[0]));
+                    //</editor-fold>
+                }
+                correct.append(input).append(',');
+            }
+            //</editor-fold>
+        } catch (IOException exception) {
+            return new Selector.PositionResult(Caret.OTHER);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -27,14 +129,14 @@ public class SelectorParser<Type> {
         }
     }
 
-    private boolean validateFinder(StringReader reader) throws IOException {
+    boolean validateFinder(StringReader reader) throws IOException {
         final String label = readLabel(reader);
         if (label.isBlank()) return false;
         for (final Finder<? extends Type> test : universe.finders()) if (label.equals(test.key())) return true;
         return false;
     }
 
-    private boolean validateFilters(StringReader reader) throws IOException {
+    boolean validateFilters(StringReader reader) throws IOException {
         switch (reader.read()) {
             case -1:
                 return true;

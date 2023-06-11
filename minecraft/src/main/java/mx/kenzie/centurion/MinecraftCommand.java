@@ -2,6 +2,7 @@ package mx.kenzie.centurion;
 
 import mx.kenzie.centurion.selector.Criterion;
 import mx.kenzie.centurion.selector.Finder;
+import mx.kenzie.centurion.selector.Selector;
 import mx.kenzie.centurion.selector.Universe;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -45,7 +46,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public static final TypedArgument<OfflinePlayer> KNOWN_PLAYER = new ResolvablePlayerArgument<>(false),
         ANY_PLAYER = new ResolvablePlayerArgument<>(true);
     public static final TypedArgument<Predicate<Double>> INEQUALITY = new InequalityArgument();
-    public static final TypedArgument<MinecraftSelector> SELECTOR = new SelectorArgument().labelled("entity");
+    public static final TypedArgument<Selector<Entity>> SELECTOR = new MinecraftSelectorArgument().labelled("entity");
     public static final TypedArgument<World> WORLD = new WorldArgument();
     public static final TypedArgument<NamespacedKey> KEY = new KeyArgument();
     public static final TypedArgument<Tag<Material>> MATERIAL_TAG = TagArgument.materials();

@@ -36,6 +36,23 @@ public class Selector<Type> {
         return (Selector<Result>) new SelectorParser<>(selector, universe).parse();
     }
 
+    @SafeVarargs
+    public static <Type> Selector<Type> fixed(Type... inputs) {
+        return new Selector<>(null) {
+            final Type[] values = inputs;
+
+            @Override
+            public List<Type> getAll(CommandSender sender) {
+                return List.of(values);
+            }
+
+            @Override
+            public Type getOne(CommandSender sender) {
+                return values.length > 0 ? values[0] : null;
+            }
+        };
+    }
+
     public static <Type> Selector<Type> empty() {
         return new Selector<>(null) {
             @Override

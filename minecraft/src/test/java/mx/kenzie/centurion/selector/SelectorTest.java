@@ -56,6 +56,17 @@ public class SelectorTest {
     }
 
     @Test
+    // find numbers NOT > 3 from a set of "even numbers"
+    public void negate() {
+        final Universe<Integer> universe = Universe.of(numbers, odds, evens, under, over);
+        final Selector<Integer> selector = new SelectorParser<>("@evens[over=!3]", universe).parse();
+        final List<Integer> list = selector.getAll(new TestCommandSender());
+        assert list != null;
+        assert !list.isEmpty();
+        assert list.equals(List.of(2)) : list;
+    }
+
+    @Test
     // find numbers < 5
     public void predicate() {
         final Universe<Integer> universe = Universe.of(numbers, odds, evens, under, over, value);
@@ -78,8 +89,11 @@ public class SelectorTest {
             "@evens[value=", "@evens[over=");
         assert this.compare(Selector.position("/test @evens[un", universe), Caret.IN_KEY, "@evens[under=");
         assert this.compare(Selector.position("/test @evens[under", universe), Caret.AFTER_KEY, "@evens[under=");
+        assert this.compare(Selector.position("/test @evens[under=", universe), Caret.IN_VALUE, "@evens[under=!");
         assert this.compare(Selector.position("/test @evens[value=..5", universe), Caret.AFTER_VALUE,
             "@evens[value=..5]", "@evens[value=..5,");
+        assert this.compare(Selector.position("/test @evens[value=!..5", universe), Caret.AFTER_VALUE,
+            "@evens[value=!..5]", "@evens[value=!..5,");
     }
 
     private boolean compare(Selector.PositionResult result, Caret caret, String... suggestions) {

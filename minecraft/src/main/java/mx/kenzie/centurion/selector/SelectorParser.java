@@ -74,11 +74,26 @@ public class SelectorParser<Type> {
                 caret = Caret.IN_VALUE;
                 correct.append(label).append('=');
                 final StringBuilder consequent = new StringBuilder();
+                boolean invert = false;
                 do {
                     final int c = reader.read();
-                    if (c == -1) {
+                    if (c == '!' && !invert && consequent.toString().isBlank()) {
+                        correct.append('!');
+                        invert = true;
+                        continue;
+                    } else if (c == -1) {
                         //<editor-fold desc="Suggest Values" defaultstate="collapsed">
                         final String value = consequent.toString();
+                        if (value.isBlank()) {
+                            for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
+                                if (!criterion.label().equals(label)) continue;
+                                for (final String possibility : criterion.argument().possibilities()) {
+                                    set.add(correct + possibility);
+                                    set.add(correct.toString() + '!' + possibility);
+                                }
+                            }
+                            if (set.isEmpty()) set.add(correct.toString() + '!');
+                        }
                         for (final Criterion<? extends Type, ?> criterion : universe.criteria()) {
                             if (!criterion.label().equals(label)) continue;
                             for (final String possibility : criterion.argument().possibilities()) {

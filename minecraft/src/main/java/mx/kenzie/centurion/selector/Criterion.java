@@ -33,7 +33,7 @@ public interface Criterion<Type, Test> {
         Y_ROTATION = of("y_rotation", MinecraftCommand.INEQUALITY,
             (entity, predicate) -> predicate.test((double) entity.getLocation().getYaw()));
     Criterion<Entity, EntityType> ENTITY_TYPE = of("type", MinecraftCommand.ENTITY_TYPE,
-        (entity, type) -> entity.getType() != type);
+        (entity, type) -> entity.getType() == type);
     Criterion<Entity, GameMode> GAME_MODE = of("gamemode", MinecraftCommand.GAME_MODE,
         (entity, mode) -> entity instanceof Player player && player.getGameMode() == mode);
     Criterion<?, Integer> LIMIT = new LimitCriterion();

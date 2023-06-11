@@ -89,7 +89,7 @@ public class SelectorParser<Type> {
                                 if (!criterion.label().equals(label)) continue;
                                 for (final String possibility : criterion.argument().possibilities()) {
                                     set.add(correct + possibility);
-                                    set.add(correct.toString() + '!' + possibility);
+                                    if (!invert) set.add(correct.toString() + '!' + possibility);
                                 }
                             }
                             if (set.isEmpty()) set.add(correct.toString() + '!');

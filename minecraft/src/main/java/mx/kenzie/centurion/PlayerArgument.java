@@ -14,6 +14,7 @@ class PlayerArgument extends ResolvablePlayerArgument<Player> {
 
     @Override
     public boolean matches(String input) {
+        if (input.isBlank()) return false; // bukkit can match "" to a single online player, ruining tab logic
         return Bukkit.getPlayer(input) != null;
     }
 

@@ -93,10 +93,16 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         Criterion.LIMIT, Criterion.GAME_MODE, Criterion.LEVEL, Criterion.X_ROTATION, Criterion.Y_ROTATION);
 
     static {
-        ((CompoundArgument<Location>) LOCATION).arg(OFFSET, "of", SELECTOR,
-                arguments -> arguments.<MinecraftSelector>get(1).getEntity(Command.<CommandSender>getContext().getSender())
-                    .getLocation().add(arguments.<RelativeVector>get(0)))
-            .arg(OFFSET, "of", LOCATION, arguments -> arguments.<Location>get(1).add(arguments.<RelativeVector>get(0)));
+        ((CompoundArgument<Location>) LOCATION)
+            .arg(OFFSET, "of", SELECTOR, arguments -> {
+                final RelativeVector vector = arguments.get(0);
+                final MinecraftSelector selector = arguments.get(1);
+                final Location start = selector.getEntity(Command.<CommandSender>getContext().getSender())
+                    .getLocation();
+                return vector.relativeTo(start);
+            })
+            .arg(OFFSET, "of", LOCATION,
+                arguments -> arguments.<RelativeVector>get(0).relativeTo(arguments.<Location>get(1)));
     }
 
     protected String usage;

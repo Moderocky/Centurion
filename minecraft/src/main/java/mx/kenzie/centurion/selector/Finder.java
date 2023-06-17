@@ -58,6 +58,7 @@ class PlayerFinder implements Finder<Player> {
 
     @Override
     public Collection<Player> find(CommandSender sender) {
+        if (Bukkit.getServer() == null) return Collections.emptyList();
         if (sender instanceof Player player) return Collections.singletonList(player);
         final List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         if (players.size() > 1) return players.subList(0, 1);
@@ -75,6 +76,7 @@ class RandomFinder implements Finder<Player> {
 
     @Override
     public Collection<Player> find(CommandSender sender) {
+        if (Bukkit.getServer() == null) return Collections.emptyList();
         final Player[] players = Bukkit.getOnlinePlayers().toArray(new Player[0]);
         return Collections.singletonList(players[ThreadLocalRandom.current().nextInt(players.length)]);
     }
@@ -90,6 +92,7 @@ class PlayersFinder implements Finder<Player> {
 
     @Override
     public Collection<Player> find(CommandSender sender) {
+        if (Bukkit.getServer() == null) return Collections.emptyList();
         return new HashSet<>(Bukkit.getOnlinePlayers());
     }
 
@@ -104,6 +107,7 @@ class EntityFinder implements Finder<Entity> {
 
     @Override
     public Collection<Entity> find(CommandSender sender) {
+        if (Bukkit.getServer() == null) return Collections.emptyList();
         final List<Entity> list = new ArrayList<>();
         for (final World world : Bukkit.getWorlds()) list.addAll(world.getEntities());
         return list;

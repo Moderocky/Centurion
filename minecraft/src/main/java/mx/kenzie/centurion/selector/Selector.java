@@ -1,5 +1,8 @@
 package mx.kenzie.centurion.selector;
 
+import mx.kenzie.centurion.ColorProfile;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ public class Selector<Type> {
 
     protected final Finder<Type> finder;
     protected final Filter<Type>[] filters;
+    protected String input;
 
     @SafeVarargs
     public Selector(Finder<Type> finder, Filter<Type>... filters) {
@@ -81,6 +85,39 @@ public class Selector<Type> {
             return type;
         }
         return null;
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    @Override
+    public String toString() {
+        if (input != null) return input;
+        return '@' + finder.key() + "[...]";
+    }
+
+    public Component getInput(ColorProfile profile) {
+        final TextComponent.Builder text = Component.text();
+        StringBuilder builder = new StringBuilder();
+        boolean value = false;
+        for (final char c : (input != null ? input : this.toString()).toCharArray()) {
+            switch (c) {
+                case '@', '[', ']', ',', '=' -> {
+                    if (!builder.isEmpty()) {
+                        text.append(Component.text(builder.toString(), value ? profile.light() : profile.highlight()));
+                        builder = new StringBuilder();
+                    }
+                    text.append(Component.text(c, profile.pop()));
+                }
+                default -> builder.append(c);
+            }
+            if (c == '=') value = true;
+            else if (c == ',') value = false;
+        }
+        if (!builder.isEmpty())
+            text.append(Component.text(builder.toString(), value ? profile.light() : profile.highlight()));
+        return text.build();
     }
 
     public record PositionResult(Caret caret, String... suggestions) {}

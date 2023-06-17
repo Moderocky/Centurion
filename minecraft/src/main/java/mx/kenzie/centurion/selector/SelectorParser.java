@@ -197,7 +197,9 @@ public class SelectorParser<Type> {
             if (reader.read() != '@') throw new SelectorException("Selector must start with @");
             final Finder<? extends Type> finder = this.readFinder(reader);
             final Filter<? extends Type>[] criteria = this.readFilters(reader);
-            return new Selector<>((Finder<Result>) finder, (Filter<Result>[]) criteria);
+            final Selector<Result> selector = new Selector<>((Finder<Result>) finder, (Filter<Result>[]) criteria);
+            selector.input = input.trim();
+            return selector;
         } catch (IOException exception) {
             throw new SelectorException(exception);
         }

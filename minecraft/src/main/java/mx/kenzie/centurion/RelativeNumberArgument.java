@@ -5,6 +5,7 @@ public class RelativeNumberArgument extends HashedArg<RelativeNumber> {
     public RelativeNumberArgument() {
         super(RelativeNumber.class);
         this.label = "number";
+        this.description = "A number calculated relative to another.";
     }
 
     @Override

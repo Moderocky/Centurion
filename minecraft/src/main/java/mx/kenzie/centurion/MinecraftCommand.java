@@ -58,12 +58,14 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             Arguments.DOUBLE.labelled("x"), Arguments.DOUBLE.labelled("y"), Arguments.DOUBLE.labelled("z"),
             arguments -> new Vector(arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"),
-            arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)));
+            arguments -> arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0)))
+        .described("An x/y/z vector.");
     public static final TypedArgument<Location> LOCATION = new CompoundArgument<>("location", Location.class).arg(
             VECTOR, "in", WORLD,
             arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
-        .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation());
+        .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation())
+        .described("A fixed position in a world.");
     public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset", RelativeVector.class) {
         @Override
         public String[] possibilities() {
@@ -81,11 +83,13 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         .arg(RELATIVE_NUMBER.labelled("x"), RELATIVE_NUMBER.labelled("y"), RELATIVE_NUMBER.labelled("z"),
             arguments -> new RelativeVector(arguments.get(0), arguments.get(1), arguments.get(2)))
         .arg(Arguments.DOUBLE, "meters", BLOCK_FACE.labelled("direction"), arguments -> RelativeVector.of(
-            arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))));
+            arguments.<BlockFace>get(1).getDirection().multiply(arguments.<Double>get(0))))
+        .described("An x/y/z offset from a location.");
     public static final TypedArgument<LocalVector> LOCAL_OFFSET = new CompoundArgument<>("local",
         LocalVector.class).arg(LOCAL_NUMBER.labelled("left"), LOCAL_NUMBER.labelled("up"),
-        LOCAL_NUMBER.labelled("forwards"),
-        arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)));
+            LOCAL_NUMBER.labelled("forwards"),
+            arguments -> new LocalVector(arguments.get(0), arguments.get(1), arguments.get(2)))
+        .described("A directional offset from a location.");
     public static final ColorProfile DEFAULT_PROFILE = new ColorProfile(NamedTextColor.WHITE,
         NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.GOLD);
     protected static final Universe<Entity> ENTITY_UNIVERSE = Universe.of(Finder.ALL_ENTITIES, Finder.ALL_PLAYERS,

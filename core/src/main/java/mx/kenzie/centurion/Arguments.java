@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class Arguments implements Iterable<Object> {
+public class Arguments implements Collection<Object> {
 
     public static final TypedArgument<ArgumentContainer> PATTERN = new PatternArgument();
     public static final TypedArgument<Class> CLASS = new ArgClass();
@@ -90,6 +90,53 @@ public class Arguments implements Iterable<Object> {
         return values.iterator();
     }
 
+    @NotNull
+    @Override
+    public Object[] toArray() {
+        return values.toArray();
+    }
+
+    @NotNull
+    @Override
+    public <T> T[] toArray(@NotNull T... a) {
+        return values.toArray(a);
+    }
+
+    @Override
+    public boolean add(Object object) {
+        throw new RuntimeException("Arguments collection is unmodifiable.");
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        throw new RuntimeException("Arguments collection is unmodifiable.");
+    }
+
+    @Override
+    public boolean containsAll(@NotNull Collection<?> c) {
+        return values.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(@NotNull Collection<?> c) {
+        throw new RuntimeException("Arguments collection is unmodifiable.");
+    }
+
+    @Override
+    public boolean removeAll(@NotNull Collection<?> c) {
+        throw new RuntimeException("Arguments collection is unmodifiable.");
+    }
+
+    @Override
+    public boolean retainAll(@NotNull Collection<?> c) {
+        throw new RuntimeException("Arguments collection is unmodifiable.");
+    }
+
+    @Override
+    public void clear() {
+        throw new RuntimeException("Arguments collection is unmodifiable.");
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,6 +155,11 @@ public class Arguments implements Iterable<Object> {
 
     public boolean isEmpty() {
         return values.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return values.contains(o);
     }
 
     @Override

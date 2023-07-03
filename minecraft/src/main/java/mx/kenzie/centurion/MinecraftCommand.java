@@ -232,7 +232,8 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String... args) {
         final String input;
         if (args == null || args.length < 1) input = label;
-        else input = label + " " + String.join(" ", args);
+        else input = behaviour.label + " " + String.join(" ", args);
+        // can't use the given label here in case it is plugin:alias
         final Result result = this.execute(sender, input);
         if (result.error() != null) {
             Bukkit.getLogger().log(Level.SEVERE, "Error in command: " + label + Arrays.toString(args));

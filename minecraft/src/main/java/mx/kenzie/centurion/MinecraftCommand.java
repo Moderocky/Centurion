@@ -121,7 +121,6 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         super();
         this.description = description;
         this.usage = '/' + behaviour.label;
-        this.permission = null;
         this.permissionMessage = this.getPermissionMessage();
     }
 
@@ -144,6 +143,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     }
 
     protected CommandResult printUsage(CommandSender sender, Arguments arguments) {
+        //<editor-fold desc="Print All Patterns" defaultstate="collapsed">
         final boolean tearDown = Command.getContext() == null;
         if (tearDown) Command.setContext(new Context(sender, ""));
         final ColorProfile profile = this.getProfile();
@@ -186,6 +186,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         sender.sendMessage(builder.build());
         if (tearDown) Command.setContext(null);
         return CommandResult.LAPSED;
+        //</editor-fold>
     }
 
     protected Component print(ArgumentContainer container, int step) {
@@ -199,6 +200,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     }
 
     protected Component print(Argument<?> argument, int step) {
+        //<editor-fold desc="Print [argument...]" defaultstate="collapsed">
         final ColorProfile profile = this.getProfile();
         final TextComponent.Builder builder = text();
         final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
@@ -216,6 +218,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         if (argument instanceof CompoundArgument<?> compound && step < 2) return this.print(compound, component, step);
         if (argument.description() == null) return component;
         return component.hoverEvent(text(argument.description()));
+        //</editor-fold>
     }
 
     private Component print(CompoundArgument<?> argument, Component component, int step) {
@@ -244,6 +247,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String... args) {
+        //<editor-fold desc="Tab Completion Options" defaultstate="collapsed">
         final List<String> options = new ArrayList<>();
         Command.setContext(new Context(sender, String.join(" ", args)));
         if (args.length < 1) for (ArgumentContainer argument : this.behaviour.arguments) {
@@ -277,10 +281,12 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         }
         Command.setContext(null);
         return options;
+        //</editor-fold>
     }
 
     @SuppressWarnings("deprecation")
     public void register(Plugin plugin) {
+        //<editor-fold desc="Register with Command Map" defaultstate="collapsed">
         try {
             final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class,
                 Plugin.class);
@@ -317,6 +323,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             if (manager.getPermission(permission.getName()) != null) return;
             manager.addPermission(permission);
         }
+        //</editor-fold>
     }
 
     private void update(org.bukkit.command.Command command) {

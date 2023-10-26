@@ -117,6 +117,10 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
         if (behaviour.lapse == Behaviour.DEFAULT_LAPSE) behaviour.lapse = this::printUsage;
     }
 
+    protected MinecraftCommand() {
+        this("Unknown command.");
+    }
+
     protected MinecraftCommand(String description) {
         super();
         this.description = description;

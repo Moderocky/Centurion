@@ -6,7 +6,7 @@
 
     <groupId>mx.kenzie</groupId>
     <artifactId>centurion</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
     <name>Centurion</name>
     <description>A deployable command framework.</description>
@@ -16,6 +16,7 @@
         <module>core</module>
         <module>minecraft</module>
         <module>discord</module>
+        <module>annotations</module>
     </modules>
 
     <properties>

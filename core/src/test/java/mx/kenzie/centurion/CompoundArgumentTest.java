@@ -54,7 +54,8 @@ public class CompoundArgumentTest extends Command<TestSender> {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test general <*bean>, test general <string>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns())
+            .equals("[test, test general <*bean>, test general <string>]") : Arrays.toString(this.patterns());
     }
 
     @Override

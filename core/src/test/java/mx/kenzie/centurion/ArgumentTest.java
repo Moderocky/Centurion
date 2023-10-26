@@ -74,7 +74,9 @@ public class ArgumentTest extends Command<TestSender> {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test literal, test pattern <pattern>, test argument <argument>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns())
+            .equals("[test, test literal, test pattern <pattern>, test argument <argument>]") : Arrays.toString(
+            this.patterns());
     }
 
     @Override
@@ -100,4 +102,5 @@ public class ArgumentTest extends Command<TestSender> {
                 return CommandResult.LAPSED;
             });
     }
+
 }

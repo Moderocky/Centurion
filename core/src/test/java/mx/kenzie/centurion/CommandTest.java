@@ -29,7 +29,8 @@ public class CommandTest extends Command<TestSender> {
                 return command("blob").arg("test", (o, arguments) -> {
                     assert Command.getContext() != null;
                     assert Command.getContext().getSender() == sender;
-                    return Command.getContext().getSender() == sender ? CommandResult.PASSED : CommandResult.FAILED_UNKNOWN;
+                    return Command.getContext()
+                        .getSender() == sender ? CommandResult.PASSED : CommandResult.FAILED_UNKNOWN;
                 });
             }
         };
@@ -171,7 +172,9 @@ public class CommandTest extends Command<TestSender> {
 
     @Test
     public void testPatterns() {
-        assert Arrays.toString(this.patterns()).equals("[test, test hello, test hello 12, test hello there, test hello <int>, test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(this.patterns());
+        assert Arrays.toString(this.patterns()).equals(
+            "[test, test hello, test hello 12, test hello there, test hello <int>, test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(
+            this.patterns());
     }
 
     @Override

@@ -36,4 +36,5 @@ public class ExampleCommand extends Command<PrintStream> {
                 return CommandResult.LAPSED;
             });
     }
+
 }

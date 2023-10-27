@@ -26,6 +26,16 @@ public class AnnotationTest {
         assert storage[1].equals(10) : storage[1];
     }
 
+    @Test
+    public void primitiveUnboxing() {
+        final Command<Object> command = new CommandAssembler<>(Command.class).generateSingle(new Simple());
+        final Object[] storage = new Object[1];
+        command.execute(storage, "test 5");
+        assert storage[0] != null;
+        assert storage[0] instanceof Integer : storage[0].getClass();
+        assert storage[0].equals(5) : storage[0];
+    }
+
     @CommandDetails("test")
     public static class Simple {
 
@@ -38,6 +48,14 @@ public class AnnotationTest {
             assert integer.equals(10) : integer;
             storage[0] = string;
             storage[1] = integer;
+        }
+
+        @Argument(INTEGER)
+        public void test(Object[] sender, int value) {
+            assert sender != null;
+            assert sender.length > 0;
+            assert value > 3 : value;
+            sender[0] = value;
         }
 
     }

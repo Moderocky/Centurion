@@ -24,6 +24,9 @@ public @interface CommandDetails {
      */
     String[] value() default {};
 
+    /**
+     * A description of the command.
+     */
     String description() default "";
 
 }

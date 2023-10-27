@@ -220,6 +220,7 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         }
         //</editor-fold>
         writer.visitEnd();
+        //<editor-fold desc="Load new class and create object" defaultstate="collapsed">
         final Class<?> loaded = this.loadClass(classPath, writer.toByteArray());
         try {
             for (int i = 0; i < arguments.length; i++) {
@@ -235,6 +236,7 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         } catch (Exception ex) {
             throw new CommandGenerationError("Unable to create command object.", ex);
         }
+        //</editor-fold>
     }
 
     private void checkCast(Class<?> parameter, MethodVisitor visitor) {

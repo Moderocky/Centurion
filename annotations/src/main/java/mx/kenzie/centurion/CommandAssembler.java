@@ -2,20 +2,15 @@ package mx.kenzie.centurion;
 
 import mx.kenzie.centurion.annotation.Argument;
 import mx.kenzie.centurion.annotation.CommandDetails;
+import mx.kenzie.centurion.annotation.Pattern;
 import mx.kenzie.centurion.error.CommandGenerationError;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -60,21 +55,29 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         else global = null;
         final Map<CommandDetails, CommandData> map = new HashMap<>();
         for (final Method method : source.getMethods()) {
-            if (!method.isAnnotationPresent(Argument.class)) continue;
-            if (isStaticOnly && !Modifier.isStatic(method.getModifiers())) throw new CommandGenerationError(
-                "Method '" + method + "' is not static but generator was given a class target.");
+            if (!method.isAnnotationPresent(Pattern.class) && !method.isAnnotationPresent(Argument.class)) continue;
             final CommandDetails local;
-            if (method.isAnnotationPresent(CommandDetails.class)) local = method.getAnnotation(CommandDetails.class);
+            if (method.isAnnotationPresent(CommandDetails.class))
+                local = method.getAnnotation(CommandDetails.class);
             else if (detailsKnownForClass) local = global;
-            else throw new CommandGenerationError(
-                    "No command details are known for '" + method + "'; add these to the method or the class.");
-            final Argument argument = method.getAnnotation(Argument.class);
+            else throw new CommandGenerationError("No command details are known for '"
+                    + method + "'; add these to the method or the class.");
             assert local != null;
-            final ArgumentData data = new ArgumentData(argument, method);
+            if (isStaticOnly && !Modifier.isStatic(method.getModifiers()))
+                throw new CommandGenerationError("Method '"
+                    + method + "' is not static but generator was given a class target.");
+            ArgumentList list;
+            final Strings names = local == global ? this.commandNames(local, source) : this.commandNames(local, method);
+            if (method.isAnnotationPresent(Pattern.class)) {
+                final Pattern pattern = method.getAnnotation(Pattern.class);
+                list = new PatternParser(names.label, pattern).getArguments(method);
+            } else if (method.isAnnotationPresent(Argument.class)) {
+                final Argument argument = method.getAnnotation(Argument.class);
+                list = ArgumentList.of(argument);
+            } else continue;
+            final ArgumentData data = new ArgumentData(list, method);
             if (map.containsKey(local)) map.get(local).list.add(data);
-            else map.put(local,
-                new CommandData(local == global ? this.commandNames(local, source) : this.commandNames(local, method),
-                    new ArrayList<>(List.of(data))));
+            else map.put(local, new CommandData(names, new ArrayList<>(List.of(data))));
         }
         final List<CommandType> list = new ArrayList<>();
         for (final Map.Entry<CommandDetails, CommandData> entry : map.entrySet()) {
@@ -107,6 +110,10 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         writer.visitInnerClass("mx/kenzie/centurion/Command$EmptyInput", "mx/kenzie/centurion/Command", "EmptyInput",
             ACC_PUBLIC | ACC_STATIC | ACC_ABSTRACT | ACC_INTERFACE);
         writer.visitField(ACC_PRIVATE | ACC_STATIC, "target", "Ljava/lang/Object;", null, null).visitEnd();
+        for (int i = 0; i < arguments.length; i++)
+            writer
+                .visitField(ACC_PUBLIC | ACC_STATIC, "pattern$" + i, "Ljava/util/Collection;", null, null)
+                .visitEnd();
         //</editor-fold>
         //<editor-fold desc="Constructor calling super" defaultstate="collapsed">
         int constructorSize = 1;
@@ -145,28 +152,11 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
             "(Ljava/lang/String;[Ljava/lang/String;)Lmx/kenzie/centurion/Command$Behaviour;", false);
         final String bootstrap = "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;";
         final String targetSignature = "(Ljava/lang/Object;Lmx/kenzie/centurion/Arguments;)Lmx/kenzie/centurion/Result;";
-        int maxArgsOnStack = 1;
         for (int i = 0; i < arguments.length; i++) {
             //<editor-fold desc="Create argument overload" defaultstate="collapsed">
-            int argsOnStack = 0;
+            create.visitFieldInsn(GETSTATIC, internalName, "pattern$" + i, "Ljava/util/Collection;");
             final ArgumentData data = arguments[i];
-            final Argument argument = data.argument();
-            final String[] literals;
-            if (argument.pattern().isBlank()) literals = new String[0];
-            else literals = argument.pattern().trim().split(" ");
-            for (final String literal : literals) {
-                create.visitLdcInsn(literal);
-                ++argsOnStack;
-            }
-            for (final KnownArguments knownArguments : argument.value()) {
-                create.visitFieldInsn(GETSTATIC, "mx/kenzie/centurion/KnownArguments", knownArguments.name(),
-                    "Lmx/kenzie/centurion/KnownArguments;");
-                create.visitMethodInsn(INVOKEVIRTUAL, "mx/kenzie/centurion/KnownArguments", "getArgument",
-                    "()Lmx/kenzie/centurion/Argument;", false);
-                ++argsOnStack;
-            }
-            create.visitMethodInsn(INVOKESTATIC, "java/util/List", "of",
-                "(" + ("Ljava/lang/Object;".repeat(argsOnStack)) + ")Ljava/util/List;", true);
+            final ArgumentList argument = data.argument();
             create.visitInvokeDynamicInsn("run", "()Lmx/kenzie/centurion/Command$Input;",
                 new Handle(H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory", bootstrap, false),
                 Type.getType(targetSignature),
@@ -180,12 +170,11 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
                 create.visitMethodInsn(INVOKEVIRTUAL, "mx/kenzie/centurion/Command$Behaviour", "description",
                     "(Ljava/lang/String;)Lmx/kenzie/centurion/Command$Behaviour;", false);
             }
-            maxArgsOnStack = Math.max(maxArgsOnStack, argsOnStack);
             //</editor-fold>
         }
         create.visitTypeInsn(CHECKCAST, Type.getInternalName(this.create.getReturnType()));
         create.visitInsn(ARETURN);
-        create.visitMaxs(4 + maxArgsOnStack, 1 + this.create.getParameterCount());
+        create.visitMaxs(6, 1 + this.create.getParameterCount());
         create.visitEnd();
         //</editor-fold>
         //<editor-fold desc="Create argument methods" defaultstate="collapsed">
@@ -233,8 +222,17 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         writer.visitEnd();
         final Class<?> loaded = this.loadClass(classPath, writer.toByteArray());
         try {
+            for (int i = 0; i < arguments.length; i++) {
+                final ArgumentData data = arguments[i];
+                final Field field = loaded.getField("pattern$" + i);
+                field.set(null, data.argument.arguments);
+            }
+        } catch (Exception ex) {
+            throw new CommandGenerationError("Unable to store arguments.", ex);
+        }
+        try {
             return (CommandType) loaded.getConstructor(Object.class).newInstance(target);
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             throw new CommandGenerationError("Unable to create command object.", ex);
         }
     }
@@ -285,7 +283,114 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
 
     protected record Strings(String label, String... aliases) {}
 
-    protected record ArgumentData(Argument argument, Method method) {
+    protected record ArgumentData(ArgumentList argument, Method method) {}
+
+    protected record ArgumentList(String description, Collection<mx.kenzie.centurion.Argument<?>> arguments) {
+
+        static ArgumentList of(Argument argument) {
+            final List<mx.kenzie.centurion.Argument<?>> list = new ArrayList<>();
+            if (!argument.pattern().isBlank()) for (final String string : argument.pattern().trim().split(" "))
+                list.add(new LiteralArgument(string));
+            for (final KnownArguments arguments : argument.value()) list.add(arguments.getArgument());
+            return new ArgumentList(argument.description(), list);
+        }
+
+    }
+
+    protected record PatternParser(String label, Pattern pattern) {
+
+        CommandAssembler.ArgumentList getArguments(Method method) {
+            var working = pattern.value().trim();
+            if (working.startsWith(label)) working = working.substring(0, label.length()).trim();
+            final List<Element> elements = new ArrayList<>();
+            while (!working.isEmpty()) {
+                //<editor-fold desc="Decide what kind of input this is" defaultstate="collapsed">
+                String part;
+                final int cut = working.indexOf(' ');
+                if (cut < 1) {
+                    part = working.trim();
+                    working = "";
+                } else {
+                    part = working.substring(0, cut);
+                    working = working.substring(cut).trim();
+                }
+                final boolean optional, literal, input, greedy;
+                if (part.startsWith("[") && part.endsWith("]")) {
+                    optional = true;
+                    literal = false;
+                    input = true;
+                    part = part.substring(1, part.length() - 1);
+                } else if (part.startsWith("<") && part.endsWith(">")) {
+                    optional = false;
+                    literal = false;
+                    input = true;
+                    part = part.substring(1, part.length() - 1);
+                } else {
+                    optional = false;
+                    literal = true;
+                    input = false;
+                }
+                if (!literal && part.endsWith("...")) {
+                    greedy = true;
+                    part = part.substring(0, part.length() - 3);
+                } else greedy = false;
+                //</editor-fold>
+                if (part.isBlank())
+                    throw new CommandGenerationError(
+                        "The pattern '" + pattern + "' contains an illegal unnamed input.");
+                elements.add(new Element(part, literal, optional, input, greedy));
+            }
+            if (elements.isEmpty()) return new CommandAssembler.ArgumentList(pattern.description(), List.of());
+            final List<mx.kenzie.centurion.Argument<?>> arguments = new ArrayList<>();
+            final Class<?>[] parameters = method.getParameterTypes();
+            int index = 0;
+            for (final Element element : elements) {
+                //<editor-fold desc="Try and match pattern with known arguments" defaultstate="collapsed">
+                if (element.literal) arguments.add(new LiteralArgument(element.name));
+                else {
+                    final Class<?> expected = parameters[++index];
+                    check:
+                    {
+                        if (expected == String.class && element.greedy) {
+                            arguments.add(
+                                element.optional ? Arguments.GREEDY_STRING.asOptional() : Arguments.GREEDY_STRING);
+                            break check;
+                        }
+                        for (final KnownArguments value : KnownArguments.values()) {
+                            if (expected.isAssignableFrom(value.getArgument().type)) {
+                                arguments.add(
+                                    element.optional ? value.getArgument().asOptional() : value.getArgument());
+                                break check;
+                            }
+                        }
+                        for (final KnownArguments value : KnownArguments.values()) {
+                            if (value.name().equalsIgnoreCase(element.name)) {
+                                arguments.add(
+                                    element.optional ? value.getArgument().asOptional() : value.getArgument());
+                                break check;
+                            }
+                        }
+                        if (expected.isPrimitive()) {
+                            if (expected == int.class)
+                                arguments.add(element.optional ? Arguments.INTEGER.asOptional() : Arguments.INTEGER);
+                            else if (expected == double.class)
+                                arguments.add(element.optional ? Arguments.DOUBLE.asOptional() : Arguments.DOUBLE);
+                            else if (expected == long.class)
+                                arguments.add(element.optional ? Arguments.LONG.asOptional() : Arguments.LONG);
+                            else if (expected == boolean.class)
+                                arguments.add(element.optional ? Arguments.BOOLEAN.asOptional() : Arguments.BOOLEAN);
+                            break check;
+                        }
+                        throw new CommandGenerationError(
+                            "Unable to identify what kind of argument a(n) " + expected.getSimpleName() + " named '" + element.name + "' is.");
+                    }
+                }
+                //</editor-fold>
+            }
+            return new CommandAssembler.ArgumentList(pattern.description(), arguments);
+        }
+
+        public record Element(String name, boolean literal, boolean optional, boolean input, boolean greedy) {}
 
     }
 

@@ -61,9 +61,8 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         final Map<CommandDetails, CommandData> map = new HashMap<>();
         for (final Method method : source.getMethods()) {
             if (!method.isAnnotationPresent(Argument.class)) continue;
-            if (isStaticOnly && !Modifier.isStatic(method.getModifiers()))
-                throw new CommandGenerationError(
-                    "Method '" + method + "' is not static but generator was given a class target.");
+            if (isStaticOnly && !Modifier.isStatic(method.getModifiers())) throw new CommandGenerationError(
+                "Method '" + method + "' is not static but generator was given a class target.");
             final CommandDetails local;
             if (method.isAnnotationPresent(CommandDetails.class)) local = method.getAnnotation(CommandDetails.class);
             else if (detailsKnownForClass) local = global;
@@ -73,9 +72,9 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
             assert local != null;
             final ArgumentData data = new ArgumentData(argument, method);
             if (map.containsKey(local)) map.get(local).list.add(data);
-            else map.put(local, new CommandData(local == global
-                ? this.commandNames(local, source)
-                : this.commandNames(local, method), new ArrayList<>(List.of(data))));
+            else map.put(local,
+                new CommandData(local == global ? this.commandNames(local, source) : this.commandNames(local, method),
+                    new ArrayList<>(List.of(data))));
         }
         final List<CommandType> list = new ArrayList<>();
         for (final Map.Entry<CommandDetails, CommandData> entry : map.entrySet()) {
@@ -94,15 +93,13 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
     @SuppressWarnings("unchecked")
     protected CommandType createCommand(Class<?> source, Object target, CommandDetails details, CommandData commandData) {
         final int number = index.incrementAndGet();
-        final String simpleName = "MagicCommand" + number,
-            internalName = "mx/kenzie/centurion/" + simpleName,
-            classPath = internalName.replace('/', '.');
+        final String simpleName = "MagicCommand" + number, internalName = "mx/kenzie/centurion/" + simpleName, classPath = internalName.replace(
+            '/', '.');
         final Strings strings = commandData.strings;
         final ArgumentData[] arguments = commandData.list.toArray(new ArgumentData[0]);
         final ClassWriter writer = new ClassWriter(0);
         //<editor-fold desc="Class Meta" defaultstate="collapsed">
-        writer.visit(V17, ACC_PUBLIC | ACC_SUPER, internalName,
-            null, "mx/kenzie/centurion/Command", null);
+        writer.visit(V17, ACC_PUBLIC | ACC_SUPER, internalName, null, "mx/kenzie/centurion/Command", null);
         writer.visitInnerClass("mx/kenzie/centurion/Command$Behaviour", "mx/kenzie/centurion/Command", "Behaviour",
             ACC_PUBLIC);
         writer.visitInnerClass("mx/kenzie/centurion/Command$Input", "mx/kenzie/centurion/Command", "Input",
@@ -130,8 +127,8 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         constructor.visitEnd();
         //</editor-fold>
         //<editor-fold desc="Create method" defaultstate="collapsed">
-        final MethodVisitor create = writer.visitMethod(ACC_PUBLIC, "create",
-            Type.getMethodDescriptor(this.create), null, null);
+        final MethodVisitor create = writer.visitMethod(ACC_PUBLIC, "create", Type.getMethodDescriptor(this.create),
+            null, null);
         create.visitCode();
         create.visitVarInsn(ALOAD, 0);
         create.visitLdcInsn(strings.label);
@@ -216,16 +213,18 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
                 final Class<?> parameter = method.getParameterTypes()[index];
                 caller.visitVarInsn(ALOAD, 1);
                 caller.visitIntInsn(BIPUSH, index - 1);
-                caller.visitMethodInsn(INVOKEVIRTUAL, "mx/kenzie/centurion/Arguments", "get",
-                    "(I)Ljava/lang/Object;", false);
+                caller.visitMethodInsn(INVOKEVIRTUAL, "mx/kenzie/centurion/Arguments", "get", "(I)Ljava/lang/Object;",
+                    false);
                 this.checkCast(parameter, caller);
                 ++argsOnStack;
             }
             caller.visitMethodInsn(opcode, Type.getInternalName(source), method.getName(),
                 Type.getMethodDescriptor(method), source.isInterface());
-            if (method.getReturnType() != void.class) caller.visitInsn(POP);
-            caller.visitFieldInsn(GETSTATIC, "mx/kenzie/centurion/CommandResult", "PASSED",
-                "Lmx/kenzie/centurion/CommandResult;");
+            if (!Result.class.isAssignableFrom(method.getReturnType())) {
+                if (method.getReturnType() != void.class) caller.visitInsn(POP);
+                caller.visitFieldInsn(GETSTATIC, "mx/kenzie/centurion/CommandResult", "PASSED",
+                    "Lmx/kenzie/centurion/CommandResult;");
+            }
             caller.visitInsn(ARETURN);
             caller.visitMaxs(++argsOnStack, 2);
             caller.visitEnd();
@@ -247,7 +246,8 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
             else if (parameter == char.class) check = Character.class;
             else check = Number.class;
             visitor.visitTypeInsn(CHECKCAST, Type.getInternalName(check));
-            visitor.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(check),  parameter.getSimpleName() + "Value", "()" + Type.getDescriptor(parameter), false);
+            visitor.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(check), parameter.getSimpleName() + "Value",
+                "()" + Type.getDescriptor(parameter), false);
         } else visitor.visitTypeInsn(CHECKCAST, Type.getInternalName(parameter));
     }
 
@@ -279,11 +279,9 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         return super.defineClass(path, bytecode, 0, bytecode.length);
     }
 
-    protected record CommandData(Strings strings, List<ArgumentData> list) {
-    }
+    protected record CommandData(Strings strings, List<ArgumentData> list) {}
 
-    protected record Strings(String label, String... aliases) {
-    }
+    protected record Strings(String label, String... aliases) {}
 
     protected record ArgumentData(Argument argument, Method method) {
 

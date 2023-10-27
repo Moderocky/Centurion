@@ -240,6 +240,7 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
     }
 
     private void checkCast(Class<?> parameter, MethodVisitor visitor) {
+        //<editor-fold desc="Unbox primitives or cast value" defaultstate="collapsed">
         if (parameter.isPrimitive()) {
             final Class<?> check;
             if (parameter == boolean.class) check = Boolean.class;
@@ -249,6 +250,7 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
             visitor.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(check), parameter.getSimpleName() + "Value",
                 "()" + Type.getDescriptor(parameter), false);
         } else visitor.visitTypeInsn(CHECKCAST, Type.getInternalName(parameter));
+        //</editor-fold>
     }
 
     private Strings commandNames(CommandDetails details, AnnotatedElement element) {

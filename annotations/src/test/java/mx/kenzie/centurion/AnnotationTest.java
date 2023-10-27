@@ -2,6 +2,7 @@ package mx.kenzie.centurion;
 
 import mx.kenzie.centurion.annotation.Argument;
 import mx.kenzie.centurion.annotation.CommandDetails;
+import mx.kenzie.centurion.annotation.Pattern;
 import mx.kenzie.centurion.error.CommandGenerationError;
 import org.junit.Test;
 
@@ -36,6 +37,25 @@ public class AnnotationTest {
         assert storage[0].equals(5) : storage[0];
     }
 
+    @Test
+    public void patternMatching() {
+        final Command<Object> command = new CommandAssembler<>(Command.class).generateSingle(new Simple());
+        final Object[] storage = new Object[2];
+        command.execute(storage, "test hello -5 with blob");
+        assert storage[0] != null;
+        assert storage[1] != null;
+        assert storage[0] instanceof Integer : storage[0].getClass();
+        assert storage[0].equals(-5) : storage[0];
+        assert storage[1] instanceof String : storage[1].getClass();
+        assert storage[1].equals("blob") : storage[1];
+        final Object[] second = new Object[2];
+        command.execute(second, "test hello -5 with");
+        assert second[0] != null;
+        assert second[1] == null;
+        assert second[0] instanceof Integer : second[0].getClass();
+        assert second[0].equals(-5) : second[0];
+    }
+
     @CommandDetails("test")
     public static class Simple {
 
@@ -56,6 +76,16 @@ public class AnnotationTest {
             assert sender.length > 0;
             assert value > 3 : value;
             sender[0] = value;
+        }
+
+        @Pattern("hello <int> with [string]")
+        public void test(Object[] sender, int integer, String string) {
+            assert sender != null;
+            assert sender.length > 1;
+            assert integer == -5 : integer;
+            assert string == null || string.equals("blob");
+            sender[0] = integer;
+            sender[1] = string;
         }
 
     }

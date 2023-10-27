@@ -218,7 +218,7 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
                 caller.visitIntInsn(BIPUSH, index - 1);
                 caller.visitMethodInsn(INVOKEVIRTUAL, "mx/kenzie/centurion/Arguments", "get",
                     "(I)Ljava/lang/Object;", false);
-                caller.visitTypeInsn(CHECKCAST, Type.getInternalName(parameter));
+                this.checkCast(parameter, caller);
                 ++argsOnStack;
             }
             caller.visitMethodInsn(opcode, Type.getInternalName(source), method.getName(),
@@ -238,6 +238,17 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
         } catch (Throwable ex) {
             throw new CommandGenerationError("Unable to create command object.", ex);
         }
+    }
+
+    private void checkCast(Class<?> parameter, MethodVisitor visitor) {
+        if (parameter.isPrimitive()) {
+            final Class<?> check;
+            if (parameter == boolean.class) check = Boolean.class;
+            else if (parameter == char.class) check = Character.class;
+            else check = Number.class;
+            visitor.visitTypeInsn(CHECKCAST, Type.getInternalName(check));
+            visitor.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(check),  parameter.getSimpleName() + "Value", "()" + Type.getDescriptor(parameter), false);
+        } else visitor.visitTypeInsn(CHECKCAST, Type.getInternalName(parameter));
     }
 
     private Strings commandNames(CommandDetails details, AnnotatedElement element) {

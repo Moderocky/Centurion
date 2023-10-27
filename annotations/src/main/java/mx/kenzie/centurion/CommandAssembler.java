@@ -4,6 +4,7 @@ import mx.kenzie.centurion.annotation.Argument;
 import mx.kenzie.centurion.annotation.CommandDetails;
 import mx.kenzie.centurion.annotation.Pattern;
 import mx.kenzie.centurion.error.CommandGenerationError;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
@@ -302,46 +303,7 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
     protected record PatternParser(String label, Pattern pattern) {
 
         CommandAssembler.ArgumentList getArguments(Method method) {
-            var working = pattern.value().trim();
-            if (working.startsWith(label)) working = working.substring(0, label.length()).trim();
-            final List<Element> elements = new ArrayList<>();
-            while (!working.isEmpty()) {
-                //<editor-fold desc="Decide what kind of input this is" defaultstate="collapsed">
-                String part;
-                final int cut = working.indexOf(' ');
-                if (cut < 1) {
-                    part = working.trim();
-                    working = "";
-                } else {
-                    part = working.substring(0, cut);
-                    working = working.substring(cut).trim();
-                }
-                final boolean optional, literal, input, greedy;
-                if (part.startsWith("[") && part.endsWith("]")) {
-                    optional = true;
-                    literal = false;
-                    input = true;
-                    part = part.substring(1, part.length() - 1);
-                } else if (part.startsWith("<") && part.endsWith(">")) {
-                    optional = false;
-                    literal = false;
-                    input = true;
-                    part = part.substring(1, part.length() - 1);
-                } else {
-                    optional = false;
-                    literal = true;
-                    input = false;
-                }
-                if (!literal && part.endsWith("...")) {
-                    greedy = true;
-                    part = part.substring(0, part.length() - 3);
-                } else greedy = false;
-                //</editor-fold>
-                if (part.isBlank())
-                    throw new CommandGenerationError(
-                        "The pattern '" + pattern + "' contains an illegal unnamed input.");
-                elements.add(new Element(part, literal, optional, input, greedy));
-            }
+            final List<Element> elements = this.getElements();
             if (elements.isEmpty()) return new CommandAssembler.ArgumentList(pattern.description(), List.of());
             final List<mx.kenzie.centurion.Argument<?>> arguments = new ArrayList<>();
             final Class<?>[] parameters = method.getParameterTypes();
@@ -390,6 +352,51 @@ public class CommandAssembler<CommandType extends Command<?>> extends ClassLoade
                 //</editor-fold>
             }
             return new CommandAssembler.ArgumentList(pattern.description(), arguments);
+        }
+
+        @NotNull
+        private List<Element> getElements() {
+            var working = pattern.value().trim();
+            if (working.startsWith(label)) working = working.substring(0, label.length()).trim();
+            final List<Element> elements = new ArrayList<>();
+            while (!working.isEmpty()) {
+                //<editor-fold desc="Decide what kind of input this is" defaultstate="collapsed">
+                String part;
+                final int cut = working.indexOf(' ');
+                if (cut < 1) {
+                    part = working.trim();
+                    working = "";
+                } else {
+                    part = working.substring(0, cut);
+                    working = working.substring(cut).trim();
+                }
+                final boolean optional, literal, input, greedy;
+                if (part.startsWith("[") && part.endsWith("]")) {
+                    optional = true;
+                    literal = false;
+                    input = true;
+                    part = part.substring(1, part.length() - 1);
+                } else if (part.startsWith("<") && part.endsWith(">")) {
+                    optional = false;
+                    literal = false;
+                    input = true;
+                    part = part.substring(1, part.length() - 1);
+                } else {
+                    optional = false;
+                    literal = true;
+                    input = false;
+                }
+                if (!literal && part.endsWith("...")) {
+                    greedy = true;
+                    part = part.substring(0, part.length() - 3);
+                } else greedy = false;
+                //</editor-fold>
+                if (part.isBlank())
+                    throw new CommandGenerationError(
+                        "The pattern '" + pattern + "' contains an illegal unnamed input.");
+                elements.add(new Element(part, literal, optional, input, greedy));
+            }
+            return elements;
         }
 
         public record Element(String name, boolean literal, boolean optional, boolean input, boolean greedy) {}

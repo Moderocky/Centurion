@@ -10,11 +10,11 @@ public enum KnownArguments implements ArgumentHolder {
     GREEDY_STRING(Arguments.GREEDY_STRING),
     ARGUMENT(Arguments.ARGUMENT),
     PATTERN(Arguments.PATTERN);
-    private final Argument<?> argument;
+    private final TypedArgument<?> argument;
 
-    KnownArguments(Argument<?> argument) {this.argument = argument;}
+    KnownArguments(TypedArgument<?> argument) {this.argument = argument;}
 
-    public Argument<?> getArgument() {
+    public TypedArgument<?> getArgument() {
         return argument;
     }
 }

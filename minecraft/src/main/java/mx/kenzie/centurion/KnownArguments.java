@@ -33,11 +33,11 @@ public enum KnownArguments implements ArgumentHolder {
     LOCATION(MinecraftCommand.LOCATION),
     OFFSET(MinecraftCommand.OFFSET),
     LOCAL_OFFSET(MinecraftCommand.LOCAL_OFFSET);
-    private final Argument<?> argument;
+    private final TypedArgument<?> argument;
 
-    KnownArguments(Argument<?> argument) {this.argument = argument;}
+    KnownArguments(TypedArgument<?> argument) {this.argument = argument;}
 
-    public Argument<?> getArgument() {
+    public TypedArgument<?> getArgument() {
         return argument;
     }
 }

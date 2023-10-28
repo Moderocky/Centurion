@@ -120,6 +120,15 @@ public class CommandTest extends Command<TestSender> {
     }
 
     @Test
+    public void optionalArgument() {
+        final String input = "test beans";
+        final TestSender sender = new TestSender();
+        final Result result = this.execute(sender, input);
+        assert result.successful();
+        assert Objects.equals("1", sender.output) : sender.output;
+    }
+
+    @Test
     public void inputArgument() {
         final String input = "test hello beans";
         final TestSender sender = new TestSender();
@@ -173,7 +182,7 @@ public class CommandTest extends Command<TestSender> {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns()).equals(
-            "[test, test hello, test hello 12, test hello there, test hello <int>, test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(
+            "[test, test hello, test hello 12, test hello there, test hello <int>, test beans [int], test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(
             this.patterns());
     }
 
@@ -227,6 +236,11 @@ public class CommandTest extends Command<TestSender> {
                 assert arguments.get(DOUBLE) == arguments.get(2);
                 assert arguments.get(Double.class) == arguments.get(2);
                 sender.output = "lot " + arguments.get(0) + " " + arguments.get(2);
+                return CommandResult.PASSED;
+            })
+            .arg("beans", INTEGER.asOptional(), (sender, arguments) -> {
+                assert !arguments.isEmpty();
+                sender.output = arguments.size() + "";
                 return CommandResult.PASSED;
             })
             .arg("hello", GREEDY_STRING, (sender, arguments) -> {

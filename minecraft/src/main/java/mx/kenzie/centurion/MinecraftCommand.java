@@ -65,12 +65,27 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             arguments -> new Location(arguments.get(3), arguments.<Double>get(0), arguments.get(1), arguments.get(2)))
         .arg("spawn", "of", WORLD, arguments -> arguments.<World>get(0).getSpawnLocation())
         .arg("bed", "of", PLAYER, arguments -> arguments.<Player>get(0).getPotentialBedLocation())
+        .arg("target", "block", arguments -> {
+            if (MinecraftCommand.getContextSender() instanceof Player player) {
+                final Block block = player.getTargetBlockExact(32);
+                if (block != null) return block.getLocation().toCenterLocation();
+                return player.getLocation();
+            }
+            return null;
+        })
+        .arg("target", "entity", arguments -> {
+            if (MinecraftCommand.getContextSender() instanceof Player player) {
+                final Entity entity = player.getTargetEntity(32);
+                if (entity != null) return entity.getLocation();
+                return player.getLocation();
+            }
+            return null;
+        })
         .described("A fixed position in a world.");
     public static final TypedArgument<RelativeVector> OFFSET = new CompoundArgument<>("offset", RelativeVector.class) {
         @Override
         public String[] possibilities() {
-            final Context context = MinecraftCommand.getContext();
-            if (context != null && context.sender instanceof Player player) {
+            if (MinecraftCommand.getContextSender() instanceof Player player) {
                 final Block block = player.getTargetBlockExact(5);
                 if (block != null) return new String[]{
                     "~ ~ ~",
@@ -101,8 +116,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             .arg(OFFSET, "of", SELECTOR, arguments -> {
                 final RelativeVector vector = arguments.get(0);
                 final MinecraftSelector selector = arguments.get(1);
-                final Location start = selector.getEntity(Command.<CommandSender>getContext().getSender())
-                    .getLocation();
+                final Location start = selector.getEntity(Command.getContextSender()).getLocation();
                 return vector.relativeTo(start);
             })
             .arg(OFFSET, "of", LOCATION,

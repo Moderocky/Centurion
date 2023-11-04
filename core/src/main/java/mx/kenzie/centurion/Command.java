@@ -34,6 +34,17 @@ public abstract class Command<Sender> implements Described {
         return (Command<Sender>.Context) context.get();
     }
 
+    /**
+     * Returns the currently-known sender in this thread's command execution context.
+     * Will return nothing if: 1) there is no current execution context or 2) there is no sender.
+     */
+    @SuppressWarnings("unchecked")
+    public static <Sender> Sender getContextSender() {
+        final Command<?>.Context context = getContext();
+        if (context == null) return null;
+        return (Sender) context.getSender();
+    }
+
     protected static void setContext(Command<?>.Context context) {
         Command.context.set(context);
     }

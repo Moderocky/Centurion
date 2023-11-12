@@ -32,7 +32,7 @@ class ResolvablePlayerArgument<Type extends OfflinePlayer> extends HashedArg<Typ
         if (Bukkit.getPlayer(input) != null) return (Type) Bukkit.getPlayer(input);
         try {
             return (Type) Bukkit.getOfflinePlayer(UUID.fromString(input));
-        } catch (Throwable ignore) {
+        } catch (Exception ignore) {
         }
         if (resolveNames) return (Type) Bukkit.getOfflinePlayer(input);
         else return (Type) Bukkit.getOfflinePlayerIfCached(input);

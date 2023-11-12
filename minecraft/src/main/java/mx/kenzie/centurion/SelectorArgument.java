@@ -77,7 +77,7 @@ class MinecraftSelectorArgument extends SelectorArgument<Entity> {
             final MinecraftSelector selector = this.parseNew(input);
             this.lastValue = selector;
             return selector.verify();
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             return false;
         }
     }

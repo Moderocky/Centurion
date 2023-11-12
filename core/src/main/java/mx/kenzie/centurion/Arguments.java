@@ -202,7 +202,7 @@ class ArgInteger extends HashedArg<Integer> {
         try {
             this.lastValue = Integer.parseInt(input);
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             return false;
         }
     }
@@ -228,7 +228,7 @@ class ArgLong extends HashedArg<Long> {
         try {
             this.lastValue = Long.parseLong(input);
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             return false;
         }
     }
@@ -254,7 +254,7 @@ class ArgDouble extends HashedArg<Double> {
         try {
             this.lastValue = this.parseNew(input);
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             return false;
         }
     }

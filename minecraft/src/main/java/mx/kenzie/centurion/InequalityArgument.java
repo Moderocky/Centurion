@@ -21,7 +21,7 @@ public class InequalityArgument extends HashedArg<Predicate<Double>> {
             this.lastValue = this.parseNew(input);
             this.lastHash = input.hashCode();
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             return false;
         }
     }

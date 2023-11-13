@@ -6,6 +6,7 @@ public enum KnownArguments implements ArgumentHolder {
     LONG(Arguments.LONG),
     DOUBLE(Arguments.DOUBLE),
     CLASS(Arguments.CLASS),
+    REGEX(Arguments.REGEX),
     STRING(Arguments.STRING),
     GREEDY_STRING(Arguments.GREEDY_STRING),
     QUOTE_STRING(Arguments.QUOTE_STRING),

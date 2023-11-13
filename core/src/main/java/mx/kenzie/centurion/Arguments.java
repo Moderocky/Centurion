@@ -13,6 +13,7 @@ public class Arguments implements Collection<Object> {
     public static final TypedArgument<Long> LONG = new ArgLong();
     public static final TypedArgument<Double> DOUBLE = new ArgDouble();
     public static final TypedArgument<Boolean> BOOLEAN = new ArgBoolean();
+    public static final TypedArgument<Pattern> REGEX = new RegExArgument();
     public static final TypedArgument<String> STRING = new ArgString();
     public static final TypedArgument<String> GREEDY_STRING = new ArgString() {
 

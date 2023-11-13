@@ -8,6 +8,7 @@ public enum KnownArguments implements ArgumentHolder {
     CLASS(Arguments.CLASS),
     STRING(Arguments.STRING),
     GREEDY_STRING(Arguments.GREEDY_STRING),
+    QUOTE_STRING(Arguments.QUOTE_STRING),
     ARGUMENT(Arguments.ARGUMENT),
     PATTERN(Arguments.PATTERN);
     private final TypedArgument<?> argument;

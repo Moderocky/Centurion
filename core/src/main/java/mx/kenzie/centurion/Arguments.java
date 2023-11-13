@@ -27,6 +27,7 @@ public class Arguments implements Collection<Object> {
         }
 
     };
+    public static final TypedArgument<String> QUOTE_STRING = new QuotedStringArgument();
     public static final TypedArgument<Argument> ARGUMENT = new ArgumentArgument();
 
     private final List<Object> values;

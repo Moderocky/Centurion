@@ -252,7 +252,7 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
     @Override
     public boolean onCommand(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String label, @NotNull String... args) {
         final String input;
-        if (args == null || args.length < 1) input = label;
+        if (args == null || args.length < 1) input = behaviour.label;
         else input = behaviour.label + " " + String.join(" ", args);
         // can't use the given label here in case it is plugin:alias
         final Result result = this.execute(sender, input);
@@ -428,15 +428,21 @@ public abstract class MinecraftCommand extends Command<CommandSender> implements
             return (MinecraftBehaviour) super.description(description);
         }
 
+        public MinecraftBehaviour permission(PermissionProvider provider) {
+            return this.permission(provider.qualifiedName(), provider.getDefault());
+        }
+
         public MinecraftBehaviour permission(String permission) {
-            if (previous == null) MinecraftCommand.this.permission = new Permission(permission, PermissionDefault.OP);
-            else this.permissions.put(previous, new Permission(permission));
-            return this;
+            return this.permission(permission, PermissionDefault.OP);
         }
 
         public MinecraftBehaviour permission(String permission, PermissionDefault allow) {
-            if (previous == null) MinecraftCommand.this.permission = new Permission(permission, allow);
-            else this.permissions.put(previous, new Permission(permission, allow));
+            return this.permission(new Permission(permission, allow));
+        }
+
+        public MinecraftBehaviour permission(Permission permission) {
+            if (previous == null) MinecraftCommand.this.permission = permission;
+            else this.permissions.put(previous, permission);
             return this;
         }
 

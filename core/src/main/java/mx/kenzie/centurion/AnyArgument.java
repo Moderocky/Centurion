@@ -91,6 +91,15 @@ public class AnyArgument<Type> extends TypedArgument<Type> {
         return this.extract(parsed, function);
     }
 
+    @Override
+    public String[] possibilities() {
+        final String[] strings = super.possibilities();
+        if (strings != null && strings.length > 0) return strings;
+        final Set<String> set = new LinkedHashSet<>();
+        for (final Argument<?> argument : arguments) set.addAll(List.of(argument.possibilities()));
+        return set.toArray(new String[0]);
+    }
+
     @SuppressWarnings({"unchecked", "RawUseOfParameterized"})
     private Type extract(Object value, Function function) {
         return (Type) function.apply(value);

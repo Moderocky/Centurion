@@ -16,6 +16,7 @@ public class ArgumentArgument extends TypedArgument<Argument> {
         this.registerDefault(Arguments.LONG);
         this.registerDefault(Arguments.INTEGER);
         this.registerDefault(Arguments.STRING);
+        this.registerDefault(Arguments.REGEX);
         this.registerDefault(Arguments.CLASS);
         this.registerDefault(Arguments.PATTERN);
         this.registerDefault(this);

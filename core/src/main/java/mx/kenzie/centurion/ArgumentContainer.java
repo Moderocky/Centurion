@@ -112,6 +112,7 @@ public class ArgumentContainer {
             if (o1.arguments.length > 0 && o2.arguments.length > 0) {
                 for (int i = 0; i < Math.min(l1, l2); i++) {
                     final Argument<?> first = o1.arguments[i], second = o2.arguments[i];
+                    if (Objects.equals(first, second)) continue;
                     if (first.literal() && !second.literal()) return -1;
                     else if (!first.literal() && second.literal()) return 1;
                     else if (!first.literal() && !second.literal()) break;

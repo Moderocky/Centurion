@@ -12,8 +12,12 @@ import static mx.kenzie.centurion.Arguments.STRING;
 public class CompoundArgumentTest extends Command<TestSender> {
 
     private static final CompoundArgument<String> COMPOUND = new CompoundArgument<>("bean", String.class)
+        .arg("hello", "blob", arguments -> "general kenobi")
         .arg("hello", "there", arguments -> "general kenobi")
         .arg(INTEGER, "there", arguments -> arguments.get(0) + " kenobi");
+    private static final CompoundArgument<String> COMPOUND_2 = new CompoundArgument<>("thing", String.class)
+        .arg("hello", "blob", arguments -> "general kenobi")
+        .arg("hello", "there", arguments -> "general kenobi");
 
     @BeforeClass
     public static void setup() { // warm up
@@ -55,7 +59,7 @@ public class CompoundArgumentTest extends Command<TestSender> {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns())
-            .equals("[test, test general <*bean>, test general <string>]") : Arrays.toString(this.patterns());
+            .equals("[test, test general <*bean>, test general hello <*thing>, test general <string>]") : Arrays.toString(this.patterns());
     }
 
     @Override
@@ -71,6 +75,7 @@ public class CompoundArgumentTest extends Command<TestSender> {
                 sender.output = arguments.get(0);
                 return CommandResult.PASSED;
             })
+            .arg("general", COMPOUND_2, (sender, arguments) -> CommandResult.PASSED)
             .lapse(sender -> {
                 sender.output = "lapsed";
                 return CommandResult.PASSED;

@@ -73,6 +73,10 @@ public class ArgumentContainer {
         final StringBuilder builder = new StringBuilder();
         for (Argument<?> argument : arguments) {
             builder.append(' ');
+            if (argument instanceof CompoundArgument<?> compound) {
+                final String start = compound.getCommonStart();
+                if (start != null) builder.append(start);
+            }
             final boolean optional = argument.optional(), literal = argument.literal(), plural = argument.plural();
             if (optional) builder.append('[');
             else if (!literal) builder.append('<');

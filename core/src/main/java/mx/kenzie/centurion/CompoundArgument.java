@@ -71,6 +71,30 @@ public class CompoundArgument<Type> extends TypedArgument<Type> implements Argum
         return new ArrayList<>(arguments);
     }
 
+    protected String getCommonStart() {
+        final StringBuilder start = new StringBuilder();
+        int index = 0;
+        for (; ; ++index) {
+            final String word = this.getCommonArgument(index);
+            if (word == null) break;
+            start.append(word).append(' ');
+        }
+        if (index == 0) return null;
+        return start.toString();
+    }
+
+    private String getCommonArgument(int place) {
+        String value = null;
+        for (final InnerContainer argument : arguments) {
+            if (argument.arguments.length <= place) return null;
+            final Argument<?> found = argument.arguments[place];
+            if (!found.literal()) return null;
+            if (value == null) value = found.label();
+            else if (!Objects.equals(value, found.label())) return null;
+        }
+        return value;
+    }
+
     @Override
     public boolean matches(String input) {
         if (input.hashCode() == lastHash) return true;

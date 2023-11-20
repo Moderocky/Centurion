@@ -1,8 +1,6 @@
 package mx.kenzie.centurion;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ArgumentContainer {
 
@@ -104,6 +102,26 @@ public class ArgumentContainer {
     }
 
     protected record Result(String part, String remainder, Object... inputs) {
+    }
+
+    protected record Sorter() implements Comparator<ArgumentContainer> {
+
+        @Override
+        public int compare(ArgumentContainer o1, ArgumentContainer o2) {
+            final int l1 = o1.arguments.length, l2 = o2.arguments.length;
+            if (o1.arguments.length > 0 && o2.arguments.length > 0) {
+                for (int i = 0; i < Math.min(l1, l2); i++) {
+                    final Argument<?> first = o1.arguments[i], second = o2.arguments[i];
+                    if (first.literal() && !second.literal()) return -1;
+                    else if (!first.literal() && second.literal()) return 1;
+                    else if (!first.literal() && !second.literal()) break;
+                    if (Objects.equals(first.label(), second.label())) continue;
+                    return first.label().compareTo(second.label());
+                }
+            }
+            return Integer.compare(o1.weight(), o2.weight());
+        }
+
     }
 
 }

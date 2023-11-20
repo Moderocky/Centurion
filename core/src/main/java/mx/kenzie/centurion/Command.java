@@ -210,7 +210,7 @@ public abstract class Command<Sender> implements Described {
         protected void sort() {
             if (sorted) return;
             this.sorted = true;
-            this.arguments.sort(Comparator.comparing(ArgumentContainer::weight));
+            this.arguments.sort(new ArgumentContainer.Sorter());
             int index = 0;
             if (lapse != DEFAULT_LAPSE) {
                 this.patterns = new String[arguments.size() + 1];

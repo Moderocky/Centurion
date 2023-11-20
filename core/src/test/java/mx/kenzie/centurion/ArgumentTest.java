@@ -75,7 +75,7 @@ public class ArgumentTest extends Command<TestSender> {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns())
-            .equals("[test, test literal, test pattern <pattern>, test argument <argument>]") : Arrays.toString(
+            .equals("[test, test argument <argument>, test literal, test pattern <pattern>]") : Arrays.toString(
             this.patterns());
     }
 

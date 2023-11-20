@@ -129,7 +129,7 @@ public class MinecraftCommandTest extends MinecraftCommand {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns()).equals(
-            "[test, test <*location>, test vector <*vector>, test offset <*offset>, test local <*local>, test <*vector> foo, test color <color>, test face <blockface>, test material <material>, test material gravity <material>]") : Arrays.toString(
+            "[test, test color <color>, test face <blockface>, test local <*local>, test material gravity <material>, test material <material>, test offset <*offset>, test vector <*vector>, test <*location>, test <*vector> foo]") : Arrays.toString(
             this.patterns());
     }
 

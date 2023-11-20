@@ -78,7 +78,7 @@ public class AnyArgumentTest extends Command<TestSender> {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns())
-            .equals("[test, test nothing <unknown>, test simple <string/quote>, test number <int/number>]")
+            .equals("[test, test nothing <unknown>, test number <int/number>, test simple <string/quote>]")
             : Arrays.toString(this.patterns());
     }
 

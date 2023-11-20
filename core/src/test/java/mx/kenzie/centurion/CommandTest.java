@@ -182,7 +182,7 @@ public class CommandTest extends Command<TestSender> {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns()).equals(
-            "[test, test hello, test hello 12, test hello there, test hello <int>, test beans [int], test first <int> second, test general [string], test blob [int] [boolean], test hello <string>, test blob <int> <boolean> <number>, test hello <string...>]") : Arrays.toString(
+            "[test, test beans [int], test blob [int] [boolean], test blob <int> <boolean> <number>, test first <int> second, test general [string], test hello, test hello 12, test hello there, test hello <int>, test hello <string>, test hello <string...>]") : Arrays.toString(
             this.patterns());
     }
 

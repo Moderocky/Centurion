@@ -61,7 +61,7 @@ public class QuoteArgumentTest extends Command<TestSender> {
     @Test
     public void testPatterns() {
         assert Arrays.toString(this.patterns())
-            .equals("[test, test quote <quote>, test after <quote> test]") : Arrays.toString(
+            .equals("[test, test after <quote> test, test quote <quote>]") : Arrays.toString(
             this.patterns());
     }
 
